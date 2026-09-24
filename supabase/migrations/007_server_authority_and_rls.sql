@@ -150,7 +150,7 @@ begin
   end if;
   insert into public.multiplayer_rooms(code, host_profile_id, mode, category, rounds)
   values (
-    upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 6)),
+    upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6)),
     v_profile_id,
     p_mode,
     v_category,

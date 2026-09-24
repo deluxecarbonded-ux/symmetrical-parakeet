@@ -307,7 +307,7 @@ declare
 begin
   if profile_id is null then raise exception 'Authentication required'; end if;
   insert into public.multiplayer_rooms(code, host_profile_id, mode, category, rounds)
-  values (upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 6)), profile_id, p_mode, p_category, greatest(1, least(30, p_rounds)))
+  values (upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6)), profile_id, p_mode, p_category, greatest(1, least(30, p_rounds)))
   returning * into new_room;
   insert into public.multiplayer_players(room_id, profile_id, display_name, ready)
   select new_room.id, profile_id, display_name, true from public.profiles where id = profile_id;

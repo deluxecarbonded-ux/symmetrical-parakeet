@@ -62,7 +62,7 @@ The app requires Supabase environment variables and does not fall back to browse
 
 Because the browser storage policy is strict, the Supabase client keeps the auth session in memory only (`persistSession: false`); a page reload requires signing in again. This avoids localStorage/sessionStorage while keeping all durable state in Postgres.
 
-The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data.
+Migrations `001` through `008` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data.
 
 ## Route map
 
