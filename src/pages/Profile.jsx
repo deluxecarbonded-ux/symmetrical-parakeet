@@ -325,7 +325,7 @@ export default function Profile({ mode = "single" }) {
                     )}%`
                   : solved
                     ? `${formatNumber(100, settings.locale)}%`
-                    : "—"
+                    : t("common.notAvailable")
               }
               hint={t("profile.noStats")}
               icon={Target}

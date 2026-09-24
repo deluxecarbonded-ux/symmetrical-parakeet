@@ -254,13 +254,14 @@ function Lobby({
                       category: value,
                     }))
                   }
-                  ariaLabel={t("multi.categoryLabel")}
+                  placeholder={t("common.select")}
+                   ariaLabel={t("multi.categoryLabel")}
                 />
               </div>
               <div className="name-field">
                 <label htmlFor="host-name">{t("profile.username")}</label>
                 <div className="profile-username-readonly" id="host-name">
-                  @{profile?.username || "—"}
+                  @{profile?.username || t("common.notAvailable")}
                 </div>
               </div>
               <Button
@@ -784,7 +785,7 @@ function Match({ room, currentPlayer, onAnswer, onNext, onLeave }) {
                 <Trophy size={20} />
               </div>
               <span className="section-eyebrow">{t("multi.winner")}</span>
-              <strong>{winner?.name || "—"}</strong>
+              <strong>{winner?.name || t("common.notAvailable")}</strong>
               {isHost ? (
                 <Button size="sm" onClick={onNext} iconAfter={ArrowRight}>
                   {t("common.next")}
@@ -815,7 +816,7 @@ function MatchFinished({ room, currentPlayer, onLeave }) {
           </div>
           <span className="eyebrow">{t("multi.matchFinished")}</span>
           <h1>
-            {t("multi.winner")}: {winner?.name || "—"}
+            {t("multi.winner")}: {winner?.name || t("common.notAvailable")}
           </h1>
           <p>{t("multi.scoreboard")}</p>
           <div className="final-score-list">

@@ -1,0 +1,12 @@
+{
+  "name": "एक्सोटिक",
+  "short_name": "एक्सोटिक",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "एक्सोटिक — चार अंकों के कोड के लिए पहेली गेम।",
+  "lang": "hi",
+  "dir": "ltr"
+}

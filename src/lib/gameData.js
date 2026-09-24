@@ -171,121 +171,56 @@ for (const [id, copy] of achievementCopyEntries) {
 }
 export const achievementCopy = Object.freeze(achievementCopyMap);
 
-const achievementFallbacks = {
-  first_crack: ["First crack", "Crack your first code."],
-  first_code: ["First crack", "Crack your first code."],
-  first_solve: ["First crack", "Crack your first code."],
-  first_win: ["First win", "Win your first duel."],
-  first_duel: ["First duel", "Play your first duel."],
-  first_duel_win: ["First duel win", "Win your first duel."],
-  ten_codes: ["Code starter", "Crack ten codes in this mode."],
-  ten_code: ["Code starter", "Crack ten codes in this mode."],
-  fifty_codes: ["Pattern finder", "Crack fifty codes in this mode."],
-  fifty_code: ["Pattern finder", "Crack fifty codes in this mode."],
-  ninety_codes: ["Vault master", "Crack all ninety solo codes."],
-  all_codes: ["Vault master", "Crack every code in the vault."],
-  code_collector: ["Code collector", "Build a serious collection of cracked codes."],
-  easy_master: ["Easy does it", "Complete the easy track."],
-  easy_complete: ["Easy does it", "Complete the easy track."],
-  medium_master: ["Pattern scout", "Complete the medium track."],
-  medium_complete: ["Pattern scout", "Complete the medium track."],
-  hard_master: ["Vault breaker", "Complete the hard track."],
-  hard_complete: ["Vault breaker", "Complete the hard track."],
-  all_difficulties: ["All-rounder", "Complete every solo difficulty."],
-  vault_master: ["Vault master", "Complete every solo difficulty."],
-  perfect_run: ["Perfect run", "Finish a run without a wrong answer."],
-  flawless: ["Flawless", "Finish a run without a wrong answer."],
-  streak_3: ["On a roll", "Keep a three-win streak alive."],
-  streak_7: ["Hot streak", "Keep a seven-win streak alive."],
-  streak_30: ["Unstoppable", "Keep a thirty-win streak alive."],
-  duel_streak_3: ["Duel streak", "Win three duels in a row."],
-  duel_streak_7: ["Duel specialist", "Win seven duels in a row."],
-  duel_streak_30: ["Duel legend", "Win thirty duels in a row."],
-  ten_wins: ["Duel contender", "Win ten duels."],
-  twenty_five_wins: ["Duel contender", "Win twenty-five duels."],
-  fifty_wins: ["Duel champion", "Win fifty duels."],
-  category_sweep: ["Category sweep", "Solve every category at least once."],
-  all_rounder: ["All-rounder", "Make your mark across every arena."],
-  sharp_shooter: ["Sharp shooter", "Convert difficult clues into wins."],
-  sharpshooter: ["Sharp shooter", "Convert difficult clues into wins."],
-  solo_first_crack: ["First crack", "Crack your first solo code."],
-  solo_ten_codes: ["Code starter", "Crack ten solo codes."],
-  multi_first_win: ["First duel win", "Win your first multiplayer duel."],
-  multi_ten_wins: ["Duel contender", "Win ten multiplayer duels."],
-  "single.first_crack": ["First crack", "Crack your first code."],
-  "single.codebreaker": ["Codebreaker", "Complete ten solo levels."],
-  "single.finisher": ["Finisher", "Complete a full thirty-level run."],
-  "single.completionist": ["Completionist", "Complete all ninety solo levels."],
-  "single.code_hunter": ["Code hunter", "Crack twenty-five solo codes."],
-  "single.sharp_shooter": ["Sharp shooter", "Keep your solo accuracy above eighty percent."],
-  "single.quick_thinker": ["Quick thinker", "Complete a solo level in thirty seconds or less."],
-  "single.speed_demon": ["Speed demon", "Complete ten solo levels at speed."],
-  "single.collector": ["Collector", "Collect three items in the solo shop."],
-  "single.treasurer": ["Treasurer", "Earn five hundred lifetime solo coins."],
-  "single.high_scorer": ["High scorer", "Reach ten thousand solo points."],
-  "multi.first_match": ["First match", "Play your first multiplayer match."],
-  "multi.regular": ["Regular", "Play twenty-five multiplayer matches."],
-  "multi.first_win": ["First win", "Win your first multiplayer match."],
-  "multi.champion": ["Champion", "Win ten multiplayer matches."],
-  "multi.code_hunter": ["Code hunter", "Crack twenty-five multiplayer codes."],
-  "multi.sharp_shooter": ["Sharp shooter", "Keep your multiplayer accuracy above seventy-five percent."],
-  "multi.elite": ["Elite", "Keep your multiplayer accuracy above ninety percent."],
-  "multi.high_scorer": ["High scorer", "Reach one thousand multiplayer points."],
-  "multi.score_machine": ["Score machine", "Reach five thousand multiplayer points."],
-  "multi.collector": ["Collector", "Collect three items in the duel shop."],
-  "multi.treasurer": ["Treasurer", "Earn three hundred lifetime duel coins."],
-};
-
 const metricDefinitions = {
   codes: {
     labelKey: "leaderboard.codes",
-    fallback: "Codes cracked",
+    fallback: "",
     aliases: ["codes_cracked", "solved", "cracked", "code_count"],
   },
   score: {
     labelKey: "leaderboard.score",
-    fallback: "Score",
+    fallback: "",
     aliases: ["total_score", "points", "best_score"],
   },
   accuracy: {
     labelKey: "leaderboard.accuracy",
-    fallback: "Accuracy",
+    fallback: "",
     aliases: ["accuracy_percent", "hit_rate"],
     percentage: true,
   },
   levels: {
     labelKey: "leaderboard.levels",
-    fallback: "Levels completed",
+    fallback: "",
     aliases: ["level_count", "completed_levels"],
   },
   speed: {
     labelKey: "leaderboard.metric.speed",
-    fallback: "Fast solves",
+    fallback: "",
     aliases: ["fast_solves", "speed_count", "fast_rounds"],
   },
   inventory: {
     labelKey: "leaderboard.metric.inventory",
-    fallback: "Items collected",
+    fallback: "",
     aliases: ["items", "inventory_count", "owned_items"],
   },
   wallet: {
     labelKey: "leaderboard.metric.wallet",
-    fallback: "Lifetime earnings",
+    fallback: "",
     aliases: ["lifetime_earned", "coins", "earnings"],
   },
   wins: {
     labelKey: "leaderboard.wins",
-    fallback: "Duel wins",
+    fallback: "",
     aliases: ["duels_won", "duel_wins", "victories"],
   },
   matches: {
     labelKey: "leaderboard.matches",
-    fallback: "Duels played",
+    fallback: "",
     aliases: ["duels_played", "games_played", "rounds"],
   },
   win_rate: {
     labelKey: "leaderboard.winRate",
-    fallback: "Win rate",
+    fallback: "",
     aliases: ["win_percent", "win_percentage", "winrate"],
     percentage: true,
   },
@@ -373,7 +308,7 @@ export function translateFirst(t, keys, fallback, values) {
   return fallback;
 }
 
-export function humanizeToken(value, fallback = "Achievement") {
+export function humanizeToken(value, fallback = "") {
   const token = normalizeToken(value);
   if (!token) return fallback;
   return token
@@ -390,13 +325,13 @@ export function normalizeMetric(value) {
 
 export function metricDefinition(value) {
   const key = normalizeMetric(value);
-  return (
-    metricDefinitions[key] || {
-      labelKey: `leaderboard.metric.${key || "value"}`,
-      fallback: humanizeToken(value, "Value"),
-      percentage: false,
-    }
-  );
+  const definition = metricDefinitions[key];
+  if (definition) return { ...definition, fallback: "" };
+  return {
+    labelKey: `leaderboard.metric.${key || "value"}`,
+    fallback: "",
+    percentage: false,
+  };
 }
 
 export function metricLabelKey(value) {
@@ -435,14 +370,10 @@ export function getAchievementCopy(item = {}) {
   const rpcDescriptionKey =
     safeText(source.descriptionKey, 160) ||
     safeText(source.description_key, 160);
-  const fallback =
-    achievementFallbacks[rawKey] ||
-    achievementFallbacks[rawId] ||
-    achievementFallbacks[keyToken] ||
-    achievementFallbacks[idToken] || [
-      humanizeToken(rawKey || rawId, "Achievement"),
-      "Keep going to unlock this milestone.",
-    ];
+  const fallback = [
+    "achievements.unknownTitle",
+    "achievements.unknownDescription",
+  ];
 
   return {
     titleKey:

@@ -1,0 +1,12 @@
+{
+  "name": "Exótico",
+  "short_name": "Exótico",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "Exótico — um jogo de lógica para quebrar códigos de quatro dígitos.",
+  "lang": "pt",
+  "dir": "ltr"
+}

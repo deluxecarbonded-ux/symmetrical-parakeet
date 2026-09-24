@@ -196,12 +196,12 @@ function AchievementCard({ item, t, locale, isMulti, index }) {
     copy.fallbackDescription,
   );
   const definition = metricDefinition(item.metric);
-  const metricName = translateOr(t, definition.labelKey, definition.fallback);
-  const progressLabel = translateOr(t, "achievements.progress", "Progress");
-  const unlockedLabel = translateOr(t, "achievements.unlocked", "Unlocked");
-  const lockedLabel = translateOr(t, "common.locked", "Locked");
+  const metricName = translateOr(t, definition.labelKey, t("leaderboard.metric"));
+  const progressLabel = t("achievements.progress");
+  const unlockedLabel = t("achievements.unlocked");
+  const lockedLabel = t("common.locked");
   const currentValue = item.unlocked ? item.target : item.progress;
-  const targetLabel = item.target > 0 ? formatNumber(item.target, locale) : "—";
+  const targetLabel = item.target > 0 ? formatNumber(item.target, locale) : t("common.notAvailable");
   const valueLabel = formatNumber(currentValue, locale);
   const progressValue = item.unlocked ? item.target : item.progress;
   const date = formatAchievementDate(item.unlockedAt, locale);
@@ -254,15 +254,13 @@ function AchievementCard({ item, t, locale, isMulti, index }) {
           <span className="achievement-unlocked-date">
             <Check size={12} aria-hidden="true" />{" "}
             {date
-              ? translateOr(t, "achievements.unlockedOn", `Unlocked ${date}`, {
-                  date,
-                })
+              ? t("achievements.unlockedOn", { date })
               : unlockedLabel}
           </span>
         ) : (
           <span>
             <Target size={12} aria-hidden="true" />{" "}
-            {translateOr(t, "dashboard.keepGoing", "Keep going")}
+            {t("dashboard.keepGoing")}
           </span>
         )}
         <span>{formatNumber(achievementPercent(item), locale)}%</span>
@@ -298,19 +296,11 @@ function AchievementState({ type, t, onRetry, authPath, isSignedIn }) {
       <Card className="achievement-state-card">
         <EmptyState
           icon={ShieldCheck}
-          title={translateOr(
-            t,
-            "achievements.authTitle",
-            "Sign in to unlock your record",
-          )}
-          description={translateOr(
-            t,
-            "auth.subtitle",
-            "Your progress and achievements stay private to your account.",
-          )}
+          title={t("achievements.authTitle")}
+          description={t("achievements.authDescription")}
           action={
             <LinkButton to={authPath} icon={LogIn} size="sm">
-              {translateOr(t, "nav.signIn", "Sign in")}
+              {t("nav.signIn")}
             </LinkButton>
           }
         />
@@ -323,19 +313,11 @@ function AchievementState({ type, t, onRetry, authPath, isSignedIn }) {
       <Card className="achievement-state-card">
         <EmptyState
           icon={Info}
-          title={translateOr(
-            t,
-            "achievements.errorTitle",
-            "The achievement vault is out of reach",
-          )}
-          description={translateOr(
-            t,
-            "toast.syncUnavailable",
-            "We could not load your milestones. Check your connection and try again.",
-          )}
+          title={t("achievements.errorTitle")}
+          description={t("achievements.errorDescription")}
           action={
             <Button onClick={onRetry} icon={RefreshCw} size="sm">
-              {translateOr(t, "common.retry", "Try again")}
+              {t("common.retry")}
             </Button>
           }
         />
@@ -347,16 +329,12 @@ function AchievementState({ type, t, onRetry, authPath, isSignedIn }) {
     <Card className="achievement-state-card">
       <EmptyState
         icon={Trophy}
-        title={translateOr(t, "achievements.title", "Achievements")}
-        description={translateOr(
-          t,
-          "achievements.empty",
-          "Play a round and your progress will start appearing here.",
-        )}
+        title={t("achievements.title")}
+        description={t("achievements.empty")}
         action={
           isSignedIn ? (
             <Button onClick={onRetry} icon={RefreshCw} size="sm">
-              {translateOr(t, "common.refresh", "Refresh")}
+              {t("common.refresh")}
             </Button>
           ) : null
         }
@@ -443,22 +421,10 @@ export default function Achievements({ mode = "single" }) {
   const authPath = `/${normalizedMode}/auth?next=${encodeURIComponent(
     `/${normalizedMode}/achievements`,
   )}`;
-  const modeLabel = translateOr(
-    t,
-    isMulti ? "dashboard.multiMode" : "dashboard.singleMode",
-    isMulti ? "Live duel" : "Solo sprint",
-  );
-  const pageTitle = translateOr(t, "achievements.title", "Achievements");
-  const pageDescription = translateOr(
-    t,
-    "achievements.subtitle",
-    "Small wins become a very clear pattern.",
-  );
-  const leaderboardTitle = translateOr(
-    t,
-    "leaderboard.title",
-    "Leaderboard",
-  );
+  const modeLabel = t(isMulti ? "dashboard.multiMode" : "dashboard.singleMode");
+  const pageTitle = t("achievements.title");
+  const pageDescription = t("achievements.subtitle");
+  const leaderboardTitle = t("leaderboard.title");
 
   return (
     <main
@@ -466,11 +432,7 @@ export default function Achievements({ mode = "single" }) {
     >
       <style>{gameDataStyles}</style>
       <PageHeader
-        eyebrow={translateOr(
-          t,
-          "achievements.eyebrow",
-          "YOUR MILESTONES",
-        )}
+        eyebrow={t("achievements.eyebrow")}
         title={pageTitle}
         description={pageDescription}
         actions={
@@ -489,7 +451,7 @@ export default function Achievements({ mode = "single" }) {
               </LinkButton>
             ) : (
               <LinkButton to={authPath} size="sm" icon={LogIn}>
-                {translateOr(t, "nav.signIn", "Sign in")}
+                {t("nav.signIn")}
               </LinkButton>
             )}
           </div>
@@ -502,17 +464,11 @@ export default function Achievements({ mode = "single" }) {
         </div>
         <div className="achievement-mode-copy">
           <span className="section-eyebrow">
-            {translateOr(t, "achievements.modeLabel", "MODE")}
+            {t("achievements.modeLabel")}
           </span>
           <h2>{modeLabel}</h2>
           <p>
-            {translateOr(
-              t,
-              isMulti ? "dashboard.multiDesc" : "dashboard.singleDesc",
-              isMulti
-                ? "Every duel adds another signal to your record."
-                : "Every level is another chance to see the pattern sooner.",
-            )}
+            {t(isMulti ? "dashboard.multiDesc" : "dashboard.singleDesc")}
           </p>
         </div>
         <div className="achievement-mode-total">
@@ -520,14 +476,14 @@ export default function Achievements({ mode = "single" }) {
             {formatNumber(summary.unlocked, locale)} / {formatNumber(summary.total, locale)}
           </strong>
           <span>
-            {translateOr(t, "achievements.unlockedCount", "unlocked")}
+            {t("achievements.unlockedCount")}
           </span>
         </div>
       </div>
 
       {status === "loading" ? (
         <AchievementSkeleton
-          label={translateOr(t, "achievements.loading", "Loading…")}
+          label={t("achievements.loading")}
         />
       ) : (status === "auth" || status === "error" || (status === "success" && !items.length)) ? (
         <AchievementState
@@ -539,44 +495,44 @@ export default function Achievements({ mode = "single" }) {
         />
       ) : (
         <>
-          <div className="achievement-summary-grid" aria-label="Achievement summary">
+          <div
+            className="achievement-summary-grid"
+            aria-label={t("achievements.summary")}
+          >
             <StatCard
-              label={translateOr(t, "achievements.unlocked", "Unlocked")}
+              label={t("achievements.unlocked")}
               value={formatNumber(summary.unlocked, locale)}
-              hint={translateOr(t, "achievements.unlockedHint", "Milestones earned")}
+              hint={t("achievements.unlockedHint")}
               icon={Trophy}
               tone="lime"
             />
             <StatCard
-              label={translateOr(t, "achievements.total", "Total")}
+              label={t("achievements.total")}
               value={formatNumber(summary.total, locale)}
-              hint={translateOr(t, "achievements.totalHint", "In this mode")}
+              hint={t("achievements.totalHint")}
               icon={Target}
               tone="violet"
             />
             <StatCard
-              label={translateOr(t, "single.progress", "Progress")}
+              label={t("single.progress")}
               value={`${formatNumber(summary.percent, locale)}%`}
               hint={
                 summary.locked
-                  ? translateOr(
-                      t,
-                      "achievements.remaining",
-                      `${formatNumber(summary.locked, locale)} still hidden`,
-                      { count: formatNumber(summary.locked, locale) },
-                    )
-                  : translateOr(t, "achievements.allUnlocked", "All clear")
+                  ? t("achievements.remaining", {
+                      count: formatNumber(summary.locked, locale),
+                    })
+                  : t("achievements.allUnlocked")
               }
               icon={BarChart3}
               tone="coral"
             />
           </div>
           <SectionHeading
-            eyebrow={translateOr(t, "achievements.catalog", "THE CATALOG")}
-            title={translateOr(t, "achievements.all", "All achievements")}
+            eyebrow={t("achievements.catalog")}
+            title={t("achievements.all")}
             action={
               <Pill tone="neutral" icon={Sparkles}>
-                {translateOr(t, "achievements.live", "Live progress")}
+                {t("achievements.live")}
               </Pill>
             }
           />

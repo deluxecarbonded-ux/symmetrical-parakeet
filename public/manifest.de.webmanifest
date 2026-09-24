@@ -1,12 +1,12 @@
 {
-  "name": "Exotic",
-  "short_name": "Exotic",
+  "name": "Exotik",
+  "short_name": "Exotik",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
-  "description": "Exotic — a four-digit code brain teaser.",
-  "lang": "en",
+  "description": "Exotik — ein Ratespiel für vierstellige Codes.",
+  "lang": "de",
   "dir": "ltr"
 }

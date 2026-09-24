@@ -261,7 +261,7 @@ export default function SinglePlayer() {
               <span>
                 <Trophy size={14} /> {t("single.score")}{" "}
                 <strong>
-                  {best ? formatNumber(best, settings.locale) : "—"}
+                  {best ? formatNumber(best, settings.locale) : t("common.notAvailable")}
                 </strong>
               </span>
               <span>

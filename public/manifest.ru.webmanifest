@@ -1,0 +1,12 @@
+{
+  "name": "Экзотик",
+  "short_name": "Экзотик",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "Экзотик — логическая игра с кодами из четырёх цифр.",
+  "lang": "ru",
+  "dir": "ltr"
+}

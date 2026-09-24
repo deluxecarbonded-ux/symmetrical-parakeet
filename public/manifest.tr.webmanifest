@@ -1,12 +1,12 @@
 {
-  "name": "Exotic",
-  "short_name": "Exotic",
+  "name": "Egzotik",
+  "short_name": "Egzotik",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
-  "description": "Exotic — a four-digit code brain teaser.",
-  "lang": "en",
+  "description": "Egzotik — dört haneli kodlar için bir bulmaca oyunu.",
+  "lang": "tr",
   "dir": "ltr"
 }

@@ -5,7 +5,7 @@ import {
   localizeDigitsInText,
 } from "./numerals.js";
 
-export const DEFAULT_PLAYER_NAME = "Player";
+export const DEFAULT_PLAYER_NAME = "";
 
 export function useMemoryValue(fallback) {
   const [value, setValue] = useState(fallback);

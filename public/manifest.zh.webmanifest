@@ -1,12 +1,12 @@
 {
-  "name": "Exotic",
-  "short_name": "Exotic",
+  "name": "异域",
+  "short_name": "异域",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
-  "description": "Exotic — a four-digit code brain teaser.",
-  "lang": "en",
+  "description": "异域 — 四位数代码解谜游戏。",
+  "lang": "zh",
   "dir": "ltr"
 }

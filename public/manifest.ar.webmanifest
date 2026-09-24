@@ -1,0 +1,12 @@
+{
+  "name": "إكزوتيك",
+  "short_name": "إكزوتيك",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "إكزوتيك — لعبة ألغاز لكسر الشيفرات الرباعية.",
+  "lang": "ar",
+  "dir": "rtl"
+}

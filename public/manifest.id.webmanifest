@@ -1,12 +1,12 @@
 {
-  "name": "Exotic",
-  "short_name": "Exotic",
+  "name": "Eksotis",
+  "short_name": "Eksotis",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
-  "description": "Exotic — a four-digit code brain teaser.",
-  "lang": "en",
+  "description": "Eksotis — permainan teka-teki untuk kode empat angka.",
+  "lang": "id",
   "dir": "ltr"
 }

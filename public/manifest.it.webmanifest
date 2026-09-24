@@ -1,12 +1,12 @@
 {
-  "name": "Exotic",
-  "short_name": "Exotic",
+  "name": "Esotico",
+  "short_name": "Esotico",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
-  "description": "Exotic — a four-digit code brain teaser.",
-  "lang": "en",
+  "description": "Esotico — un enigma logico con codici a quattro cifre.",
+  "lang": "it",
   "dir": "ltr"
 }

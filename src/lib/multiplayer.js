@@ -132,7 +132,7 @@ function mapRoomRows({
   playerRows,
   roundRows,
   puzzleRows,
-  fallbackName = "Player",
+  fallbackName = "",
 }) {
   const players = asRows(playerRows)
     .map((row) => ({
@@ -273,7 +273,7 @@ function actionErrorKey(error) {
 
 export function useMultiplayerRoom({
   profile,
-  defaultName = "Player",
+  defaultName = "",
   locale = "en",
   onRoundWin,
   onMatchWin,
@@ -1102,8 +1102,7 @@ export function useMultiplayerRoom({
               profile.displayName ||
               defaultName,
           ).trim() ||
-          defaultName ||
-          "Player",
+          defaultName,
         ready: currentPlayer?.ready || false,
         score: currentPlayer?.score || 0,
         codes: currentPlayer?.codes || 0,

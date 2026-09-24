@@ -11,6 +11,16 @@ if (typeof document !== "undefined") {
   );
 }
 
+function getInitialLocale() {
+  const browserLocale =
+    typeof navigator !== "undefined" ? navigator.language?.slice(0, 2) : "en";
+  return LANGUAGES.some(([code]) => code === browserLocale) ? browserLocale : "en";
+}
+
+const initialLocale = getInitialLocale();
+const manifestLink = document.querySelector('link[rel="manifest"]');
+if (manifestLink) manifestLink.href = `/manifest.${initialLocale}.webmanifest`;
+
 function getErrorCopy() {
   const browserLocale =
     typeof navigator !== "undefined" ? navigator.language?.slice(0, 2) : "en";

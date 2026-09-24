@@ -156,7 +156,7 @@ export default function Dashboard() {
           value={
             single.solved
               ? formatNumber(Math.min(99, single.solved), settings.locale)
-              : "—"
+              : t("common.notAvailable")
           }
           hint={t("dashboard.keepGoing")}
           icon={Flame}
@@ -378,7 +378,7 @@ export default function Dashboard() {
                     ? `+${formatNumber(entry.coins, settings.locale)}`
                     : entry.score
                       ? `+${formatNumber(entry.score, settings.locale)}`
-                      : "—"}
+                      : t("common.notAvailable")}
                 </b>
               </div>
             ))}

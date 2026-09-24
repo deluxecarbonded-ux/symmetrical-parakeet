@@ -15,13 +15,7 @@ export function isValidUsername(value) {
 
 export function publicUsername(profile) {
   const candidate =
-    profile?.username ||
-    (profile?.displayName && profile.displayName !== "Player"
-      ? profile.displayName
-      : "") ||
-    (profile?.display_name && profile.display_name !== "Player"
-      ? profile.display_name
-      : "");
+    profile?.username || profile?.display_name || "";
   return normalizeUsername(candidate);
 }
 
@@ -32,7 +26,7 @@ export function profileFromAuthUser(user) {
   return {
     id: user?.id,
     username: username || null,
-    displayName: username || "Player",
+    displayName: username || "",
     createdAt: new Date().toISOString(),
   };
 }

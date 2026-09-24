@@ -42,8 +42,8 @@ export function ProfileAvatar({
   reduceMotion = false,
   label,
   videoLabel,
-  muteLabel = "Mute avatar video",
-  unmuteLabel = "Unmute avatar video",
+  muteLabel = "",
+  unmuteLabel = "",
 }) {
   const [muted, setMuted] = useState(true);
   const [failed, setFailed] = useState(false);
@@ -71,8 +71,10 @@ export function ProfileAvatar({
   const username =
     profile?.username || profile?.displayName || profile?.display_name || "";
   const initials = username ? getInitials(username) : "?";
-  const accessibleName = label || username || "Profile";
+  const accessibleName = label || username || "";
   const videoAccessibleName = videoLabel || accessibleName;
+  const resolvedMuteLabel = muteLabel || videoAccessibleName;
+  const resolvedUnmuteLabel = unmuteLabel || videoAccessibleName;
 
   return (
     <span
@@ -106,8 +108,8 @@ export function ProfileAvatar({
           type="button"
           className="profile-avatar-sound"
           onClick={() => setMuted((value) => !value)}
-          aria-label={muted ? unmuteLabel : muteLabel}
-          title={muted ? unmuteLabel : muteLabel}
+          aria-label={muted ? resolvedUnmuteLabel : resolvedMuteLabel}
+          title={muted ? resolvedUnmuteLabel : resolvedMuteLabel}
         >
           {muted ? <VolumeX size={13} /> : <Volume2 size={13} />}
         </button>

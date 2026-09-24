@@ -230,6 +230,7 @@ function Topbar({ onLanguageMenuChange }) {
             }))}
             onChange={(value) => updateSettings({ locale: value })}
             onOpenChange={onLanguageMenuChange}
+            placeholder={t("common.select")}
             ariaLabel={t("language")}
           />
         </div>

@@ -525,6 +525,8 @@ export default function App() {
     document.title = t("meta.title");
     const description = document.querySelector('meta[name="description"]');
     if (description) description.setAttribute("content", t("meta.description"));
+    const manifest = document.querySelector('link[rel="manifest"]');
+    if (manifest) manifest.setAttribute("href", `/manifest.${settings.locale}.webmanifest`);
   }, [settings.locale, settings.reduceMotion, settings.theme, t]);
 
   useEffect(() => {

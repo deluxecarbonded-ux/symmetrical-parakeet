@@ -16,6 +16,7 @@ import tr from "./locales/tr.js";
 import ur from "./locales/ur.js";
 import zh from "./locales/zh.js";
 import { featureOverrides } from "./featureOverrides.js";
+import { uiCopyOverrides } from "./uiCopyOverrides.js";
 
 const fullLocaleOverrides = {
   ar,
@@ -1028,6 +1029,8 @@ const languageOverrides = {
   },
 };
 
+// Native language names are intentionally autonyms so users can identify
+// their language in any locale; surrounding interface copy is translated.
 export const LANGUAGES = [
   ["en", "English"],
   ["ar", "العربية"],
@@ -1388,6 +1391,7 @@ export const localeCoverage = Object.fromEntries(
       ...(fullLocaleOverrides[code] || {}),
       ...(localizedAuthOverrides[code] || {}),
       ...(featureOverrides[code] || {}),
+      ...(uiCopyOverrides[code] || {}),
     }).length,
   ]),
 );
@@ -1400,6 +1404,7 @@ export const translations = Object.fromEntries(
       ...(fullLocaleOverrides[code] || {}),
       ...(localizedAuthOverrides[code] || {}),
       ...(featureOverrides[code] || {}),
+      ...(uiCopyOverrides[code] || {}),
     },
   ]),
 );
@@ -1504,7 +1509,11 @@ for (const [locale, copy] of Object.entries(publicCopyOverrides)) {
     translations[locale]["multi.shareRoom"] ||
     translations[locale]["multi.ready"];
   translations[locale]["settings.realtimeReady"] =
-    translations[locale]["multi.ready"] || "Ready";
+    translations[locale]["multi.ready"] || translations.en["multi.ready"];
+}
+
+for (const [locale, copy] of Object.entries(uiCopyOverrides)) {
+  Object.assign(translations[locale], copy);
 }
 
 for (const [locale, value] of Object.entries(localizedOrOverrides)) {

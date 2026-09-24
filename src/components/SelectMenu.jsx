@@ -8,7 +8,7 @@ export default function SelectMenu({
   onChange,
   onOpenChange,
   ariaLabel,
-  placeholder = "Select",
+  placeholder = "",
   className = "",
   disabled = false,
   reduceMotion = false,

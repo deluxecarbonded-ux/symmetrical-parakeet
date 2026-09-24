@@ -67,7 +67,7 @@ async function requestLeaderboard({ mode, metric, limit }) {
   return fallback.error ? fallback : primary;
 }
 
-function normalizeLeaderboardRow(row, index, selectedMetric) {
+function normalizeLeaderboardRow(row, index, selectedMetric, t) {
   const source = row && typeof row === "object" ? row : {};
   const username = safeText(source.username, 40).replace(/[<>]/g, "");
   const rank = Math.max(1, Math.round(safeNumber(source.rank, index + 1)));
@@ -75,7 +75,7 @@ function normalizeLeaderboardRow(row, index, selectedMetric) {
     rank,
     // The RPC's username and avatar columns are the only identity fields this
     // page is allowed to consume.
-    username: username || "Player",
+    username: username || t("profile.defaultPlayerName"),
     avatar_url:
       safeText(source.avatar_url, 2048) || safeText(source.avatar_path, 2048),
     avatar_bucket: safeText(source.avatar_bucket, 80),
@@ -159,7 +159,7 @@ function SafeAvatar({ row, reduceMotion }) {
 
 function LeaderboardRow({ row, t, locale, selectedMetric, isMulti, reduceMotion }) {
   const definition = metricDefinition(row.metric || selectedMetric);
-  const metricName = translateOr(t, definition.labelKey, definition.fallback);
+  const metricName = translateOr(t, definition.labelKey, t("leaderboard.metric"));
   const value = formatNumber(row.value, locale);
   const displayValue = isPercentageMetric(row.metric || selectedMetric)
     ? `${value}%`
@@ -188,7 +188,7 @@ function LeaderboardRow({ row, t, locale, selectedMetric, isMulti, reduceMotion 
           <strong title={row.username}>{row.username}</strong>
           {row.is_current_user && (
             <span className="global-leaderboard-you">
-              {translateOr(t, "leaderboard.you", "You")}
+              {t("leaderboard.you")}
             </span>
           )}
         </div>
@@ -197,11 +197,7 @@ function LeaderboardRow({ row, t, locale, selectedMetric, isMulti, reduceMotion 
       <div className="global-leaderboard-value">
         <strong>{displayValue}</strong>
         <span>
-          {translateOr(
-            t,
-            isMulti ? "nav.multi" : "nav.single",
-            isMulti ? "Duel" : "Solo",
-          )}
+          {t(isMulti ? "nav.multi" : "nav.single")}
         </span>
       </div>
     </div>
@@ -237,15 +233,11 @@ function LeaderboardState({ type, t, onRetry, authPath, isSignedIn }) {
       <Card className="achievement-state-card">
         <EmptyState
           icon={LogIn}
-          title={translateOr(t, "leaderboard.authTitle", "Sign in to see your place")}
-          description={translateOr(
-            t,
-            "leaderboard.authDescription",
-            "Sign in to view the rankings and your current position.",
-          )}
+          title={t("leaderboard.authTitle")}
+          description={t("leaderboard.authDescription")}
           action={
             <LinkButton to={authPath} icon={LogIn} size="sm">
-              {translateOr(t, "nav.signIn", "Sign in")}
+              {t("nav.signIn")}
             </LinkButton>
           }
         />
@@ -258,24 +250,16 @@ function LeaderboardState({ type, t, onRetry, authPath, isSignedIn }) {
       <Card className="achievement-state-card">
         <EmptyState
           icon={Info}
-          title={translateOr(
-            t,
-            "leaderboard.errorTitle",
-            "The rankings are temporarily offline",
-          )}
-          description={translateOr(
-            t,
-            "toast.syncUnavailable",
-            "We could not load the rankings. Check your connection and try again.",
-          )}
+          title={t("leaderboard.errorTitle")}
+          description={t("leaderboard.errorDescription")}
           action={
             <div className="header-action-cluster">
               <Button onClick={onRetry} icon={RefreshCw} size="sm">
-                {translateOr(t, "common.retry", "Try again")}
+                {t("common.retry")}
               </Button>
               {!isSignedIn && (
                 <LinkButton to={authPath} variant="quiet" size="sm" icon={LogIn}>
-                  {translateOr(t, "nav.signIn", "Sign in")}
+                  {t("nav.signIn")}
                 </LinkButton>
               )}
             </div>
@@ -289,22 +273,18 @@ function LeaderboardState({ type, t, onRetry, authPath, isSignedIn }) {
     <Card className="achievement-state-card">
       <EmptyState
         icon={Trophy}
-        title={translateOr(t, "leaderboard.title", "Leaderboard")}
-        description={translateOr(
-          t,
-          "leaderboard.empty",
-          "Be the first player to put a signal on the board.",
-        )}
+        title={t("leaderboard.title")}
+        description={t("leaderboard.empty")}
         action={
           <div className="header-action-cluster">
             {isSignedIn && (
               <Button onClick={onRetry} icon={RefreshCw} size="sm">
-                {translateOr(t, "common.refresh", "Refresh")}
+                {t("common.refresh")}
               </Button>
             )}
             {!isSignedIn && (
               <LinkButton to={authPath} size="sm" icon={LogIn}>
-                {translateOr(t, "nav.signIn", "Sign in")}
+                {t("nav.signIn")}
               </LinkButton>
             )}
           </div>
@@ -370,7 +350,7 @@ export default function Leaderboard({
       const data = Array.isArray(response?.data) ? response.data : [];
       setRows(
         data
-          .map((row, index) => normalizeLeaderboardRow(row, index, metric))
+          .map((row, index) => normalizeLeaderboardRow(row, index, metric, t))
           .sort((left, right) => left.rank - right.rank),
       );
       setStatus("success");
@@ -417,7 +397,7 @@ export default function Leaderboard({
       const definition = metricDefinition(choice.value);
       return {
         value: choice.value,
-        label: translateOr(t, definition.labelKey, definition.fallback),
+        label: translateOr(t, definition.labelKey, t("leaderboard.metric")),
       };
     });
   }, [metric, normalizedMode, rows, t]);
@@ -426,28 +406,20 @@ export default function Leaderboard({
   const selectedMetricLabel = translateOr(
     t,
     selectedDefinition.labelKey,
-    selectedDefinition.fallback,
+    t("leaderboard.metric"),
   );
   const authPath = `/${normalizedMode}/auth?next=${encodeURIComponent(
     `/${normalizedMode}/leaderboard`,
   )}`;
-  const pageTitle = translateOr(t, "leaderboard.title", "Leaderboard");
-  const pageDescription = translateOr(
-    t,
-    "leaderboard.subtitle",
-    "See who has found the sharpest pattern.",
-  );
-  const modeLabel = translateOr(
-    t,
-    isMulti ? "dashboard.multiMode" : "dashboard.singleMode",
-    isMulti ? "Live duel" : "Solo sprint",
-  );
+  const pageTitle = t("leaderboard.title");
+  const pageDescription = t("leaderboard.subtitle");
+  const modeLabel = t(isMulti ? "dashboard.multiMode" : "dashboard.singleMode");
 
   return (
     <main className={`page leaderboard-page ${reduceMotion ? "reduce-motion-safe" : ""}`}>
       <style>{gameDataStyles}</style>
       <PageHeader
-        eyebrow={translateOr(t, "leaderboard.eyebrow", "THE SIGNAL BOARD")}
+        eyebrow={t("leaderboard.eyebrow")}
         title={pageTitle}
         description={pageDescription}
         actions={
@@ -462,11 +434,11 @@ export default function Leaderboard({
                 size="sm"
                 icon={Sparkles}
               >
-                {translateOr(t, "achievements.title", "Achievements")}
+                {t("achievements.title")}
               </LinkButton>
             ) : (
               <LinkButton to={authPath} size="sm" icon={LogIn}>
-                {translateOr(t, "nav.signIn", "Sign in")}
+                {t("nav.signIn")}
               </LinkButton>
             )}
           </div>
@@ -476,18 +448,19 @@ export default function Leaderboard({
       <Card className="leaderboard-controls-card">
         <div className="leaderboard-controls-copy">
           <span className="section-eyebrow">
-            {translateOr(t, "leaderboard.rankBy", "RANK BY")}
+            {t("leaderboard.rankBy")}
           </span>
           <h2>{selectedMetricLabel}</h2>
         </div>
         <div className="leaderboard-metric-control">
-          <span>{translateOr(t, "leaderboard.metric", "Metric")}</span>
+          <span>{t("leaderboard.rankBy")}</span>
           <SelectMenu
             className="leaderboard-select"
             value={metric}
             options={metricChoices}
             onChange={setMetric}
-            ariaLabel={translateOr(t, "leaderboard.metric", "Metric")}
+             placeholder={t("common.select")}
+            ariaLabel={t("leaderboard.rankBy")}
           />
         </div>
       </Card>
@@ -497,22 +470,14 @@ export default function Leaderboard({
           <Info size={17} aria-hidden="true" />
           <div>
             <strong>
-              {translateOr(
-                t,
-                "leaderboard.authTitle",
-                "Sign in to see your place",
-              )}
+{t("leaderboard.authTitle")}
             </strong>
             <span>
-              {translateOr(
-                t,
-                "auth.subtitle",
-                "The public board is available, but your position needs an account.",
-              )}
+{t("leaderboard.authDescription")}
             </span>
           </div>
           <LinkButton to={authPath} variant="quiet" size="sm" icon={LogIn}>
-            {translateOr(t, "nav.signIn", "Sign in")}
+            {t("nav.signIn")}
           </LinkButton>
         </Card>
       )}
@@ -522,16 +487,16 @@ export default function Leaderboard({
           <div className="leaderboard-list-heading">
             <div>
               <span className="section-eyebrow">
-                {translateOr(t, "leaderboard.board", "LIVE BOARD")}
+                {t("leaderboard.board")}
               </span>
               <h2>{selectedMetricLabel}</h2>
             </div>
             <span>
-              {translateOr(t, "leaderboard.loading", "Loading…")}
+              {t("leaderboard.loading")}
             </span>
           </div>
           <LeaderboardSkeleton
-            label={translateOr(t, "leaderboard.loading", "Loading…")}
+            label={t("leaderboard.loading")}
           />
         </Card>
       ) : (status === "auth" || status === "error" || (status === "success" && !rows.length)) ? (
@@ -545,12 +510,12 @@ export default function Leaderboard({
       ) : (
         <>
           <SectionHeading
-            eyebrow={translateOr(t, "leaderboard.board", "LIVE BOARD")}
+            eyebrow={t("leaderboard.board")}
             title={selectedMetricLabel}
             action={
               <Pill tone="neutral" icon={Target}>
                 {formatNumber(rows.length, locale)}{" "}
-                {translateOr(t, "leaderboard.player", "players")}
+                {t("leaderboard.players")}
               </Pill>
             }
           />
@@ -558,12 +523,12 @@ export default function Leaderboard({
             <div className="leaderboard-list-heading">
               <div>
                 <span className="section-eyebrow">
-                  {translateOr(t, "leaderboard.rank", "RANK")}
+                  {t("leaderboard.rank")}
                 </span>
                 <h2>{selectedMetricLabel}</h2>
               </div>
               <span>
-                {translateOr(t, "leaderboard.updated", "Server ranked")}
+                {t("leaderboard.updated")}
               </span>
             </div>
             <div className="global-leaderboard-list" role="list">

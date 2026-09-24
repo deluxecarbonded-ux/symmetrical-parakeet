@@ -105,6 +105,7 @@ export default function Settings() {
                   }))}
                   onChange={(value) => updateSettings({ locale: value })}
                   onOpenChange={onLanguageMenuChange}
+                   placeholder={t("common.select")}
                   ariaLabel={t("language")}
                 />
               </div>

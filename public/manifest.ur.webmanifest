@@ -1,0 +1,12 @@
+{
+  "name": "ایگزٹک",
+  "short_name": "ایگزٹک",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "ایگزٹک — چار ہندسوں کے کوڈ کے لیے پزل گیم۔",
+  "lang": "ur",
+  "dir": "rtl"
+}
