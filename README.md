@@ -20,6 +20,10 @@ Exotic is a responsive code-and-word brain-teaser game built with React, Vite, L
 - Arabic, Urdu, and Hindi numeral systems with locale-aware display and input normalization
 - Light/dark themes with the requested button and icon contrast tokens
 - No seeded users, fake rooms, fake purchases, or mock account records
+- Database-backed solo and duel achievements with durable progress and unlock timestamps
+- Live solo and duel leaderboards ranked from authoritative gameplay aggregates
+- Registered usernames as the only public player identity; account email remains private
+- Public image/video profile media buckets with authenticated owner-folder uploads and muted-by-default video avatars
 
 ## Run locally
 
@@ -61,7 +65,7 @@ The app requires Supabase environment variables and does not fall back to browse
 
 Because the browser storage policy is strict, the Supabase client keeps the auth session in memory only (`persistSession: false`); a page reload requires signing in again. This avoids localStorage/sessionStorage while keeping all durable state in Postgres.
 
-Migrations `001` through `009` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data.
+Migrations `001` through `012` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data. Migration `010` adds database-backed achievement definitions and progress, ranked leaderboard RPCs, canonical username synchronization, and authenticated profile media buckets/policies; migration `011` hardens the leaderboard response contract; migration `012` makes multiplayer timing and winner aggregation server-derived and idempotent.
 
 ## Route map
 
@@ -70,9 +74,14 @@ Migrations `001` through `009` are included. The migrations intentionally do not
 - `/single/play` active solo puzzle
 - `/single/shop` solo shop and solo wallet
 - `/single/profile` solo profile
+- `/single/achievements` real solo achievements
+- `/single/leaderboard` real solo rankings
 - `/multi` multiplayer lobby and active match
 - `/multi/shop` duel shop and duel wallet
 - `/multi/profile` duel profile
+- `/multi/achievements` real duel achievements
+- `/multi/leaderboard` real duel rankings
+- `/achievements` and `/leaderboard` redirect to the solo routes
 - `/settings` preferences, theme, locale, and database reset
 - `/single/auth` and `/multi/auth` separated auth entry points
 - `/auth` account entry

@@ -29,7 +29,7 @@ import {
   SectionHeading,
   StatCard,
 } from "../components/Primitives";
-import { formatDate, formatNumber, getInitials } from "../lib/storage";
+import { formatDate, formatNumber } from "../lib/storage";
 import { formatCode } from "../lib/numerals";
 import { DIFFICULTIES } from "../data/puzzles";
 
@@ -88,7 +88,8 @@ export default function Dashboard() {
   );
   const currentDifficulty =
     DIFFICULTIES.find((item) => item.id === "easy") || DIFFICULTIES[0];
-  const displayName = profile?.displayName || t("profile.defaultPlayerName");
+  const displayName =
+    profile?.username || profile?.displayName || t("profile.defaultPlayerName");
 
   return (
     <main className="page dashboard-page">
@@ -217,6 +218,28 @@ export default function Dashboard() {
                   <ArrowRight size={16} />
                 </span>
               </div>
+            </Link>
+          </div>
+          <div className="dashboard-records-links" aria-label={t("nav.achievements")}>
+            <Link to="/single/achievements" className="dashboard-record-link">
+              <Trophy size={15} />
+              <span>{t("nav.achievements")}</span>
+              <small>{t("dashboard.singleMode")}</small>
+            </Link>
+            <Link to="/single/leaderboard" className="dashboard-record-link">
+              <BarChart3 size={15} />
+              <span>{t("nav.leaderboard")}</span>
+              <small>{t("dashboard.singleMode")}</small>
+            </Link>
+            <Link to="/multi/achievements" className="dashboard-record-link">
+              <Trophy size={15} />
+              <span>{t("nav.achievements")}</span>
+              <small>{t("dashboard.multiMode")}</small>
+            </Link>
+            <Link to="/multi/leaderboard" className="dashboard-record-link">
+              <BarChart3 size={15} />
+              <span>{t("nav.leaderboard")}</span>
+              <small>{t("dashboard.multiMode")}</small>
             </Link>
           </div>
           <SectionHeading

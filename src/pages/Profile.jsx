@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   Award,
@@ -17,6 +17,7 @@ import {
   Sparkles,
   Target,
   Trophy,
+  Upload,
   UsersRound,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -31,21 +32,43 @@ import {
   SectionHeading,
   StatCard,
 } from "../components/Primitives";
-import { formatDate, formatNumber, getInitials } from "../lib/storage";
+import { formatDate, formatNumber } from "../lib/storage";
+import ProfileAvatar from "../components/ProfileMedia";
 
 export default function Profile({ mode = "single" }) {
-  const { t, profile, progress, wallet, settings, saveDisplayName, signOut } =
-    useApp();
+  const {
+    t,
+    profile,
+    progress,
+    wallet,
+    settings,
+    saveUsername,
+    uploadAvatar,
+    signOut,
+  } = useApp();
   const navigate = useNavigate();
-  const [name, setName] = useState(profile?.displayName || "");
+  const [name, setName] = useState(profile?.username || profile?.displayName || "");
   const [editing, setEditing] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const mediaInputRef = useRef(null);
   const isSingle = mode === "single";
   const data = isSingle ? progress.single : progress.multi;
-  useEffect(() => setName(profile?.displayName || ""), [profile?.displayName]);
+  useEffect(
+    () => setName(profile?.username || profile?.displayName || ""),
+    [profile?.displayName, profile?.username],
+  );
   const solved = data?.solved || 0;
   const score = data?.score || 0;
   const rounds = isSingle ? solved : data?.matches || 0;
   const history = data?.history || [];
+  const handleMediaChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setUploadingMedia(true);
+    await uploadAvatar(file);
+    setUploadingMedia(false);
+  };
 
   return (
     <main className="page profile-page">
@@ -72,16 +95,45 @@ export default function Profile({ mode = "single" }) {
           </div>
         }
       />
+      {profile && (
+        <div className="profile-records-nav">
+          <LinkButton
+            to={`/${mode}/achievements`}
+            variant="quiet"
+            size="sm"
+            icon={Award}
+          >
+            {t("nav.achievements")}
+          </LinkButton>
+          <LinkButton
+            to={`/${mode}/leaderboard`}
+            variant="quiet"
+            size="sm"
+            icon={BarChart3}
+          >
+            {t("nav.leaderboard")}
+          </LinkButton>
+        </div>
+      )}
       <div className="profile-layout">
         <div className="profile-main">
           <Card className="profile-identity-card">
             <div className="profile-avatar-large">
               {profile ? (
-                getInitials(profile.displayName)
+                <ProfileAvatar
+                  profile={profile}
+                  size="large"
+                  showSoundToggle
+                  reduceMotion={settings.reduceMotion}
+                  label={t("profile.username")}
+                  videoLabel={t("profile.avatarVideo")}
+                  muteLabel={t("profile.muteAvatar")}
+                  unmuteLabel={t("profile.unmuteAvatar")}
+                />
               ) : (
                 <CircleUserRound size={31} />
               )}
-              <span className="avatar-status" />
+              {profile && <span className="avatar-status" />}
             </div>
             <div className="profile-identity-copy">
               <span className="section-eyebrow">
@@ -89,8 +141,12 @@ export default function Profile({ mode = "single" }) {
                   ? t("profile.soloProgress")
                   : t("profile.multiplayerProgress")}
               </span>
-              <h2>{profile?.displayName || t("nav.signIn")}</h2>
-              <p>{profile?.email || t("nav.signIn")}</p>
+              <h2>{profile?.username || profile?.displayName || t("nav.signIn")}</h2>
+              <p>
+                {profile
+                  ? `@${profile.username || profile.displayName}`
+                  : t("nav.signIn")}
+              </p>
               <div className="identity-pills">
                 <Pill tone="lime" icon={ShieldCheck}>
                   {profile ? t("profile.connected") : t("nav.signIn")}
@@ -101,7 +157,7 @@ export default function Profile({ mode = "single" }) {
               <button
                 className="icon-button profile-edit"
                 onClick={() => setEditing((value) => !value)}
-                aria-label={t("profile.editName")}
+                aria-label={t("profile.editUsername")}
               >
                 <Edit3 size={17} />
               </button>
@@ -111,13 +167,14 @@ export default function Profile({ mode = "single" }) {
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder={t("profile.displayName")}
+                  placeholder={t("profile.username")}
+                  autoComplete="username"
+                  dir="ltr"
                 />
                 <Button
                   size="sm"
-                  onClick={() => {
-                    saveDisplayName(name);
-                    setEditing(false);
+                  onClick={async () => {
+                    if (await saveUsername(name)) setEditing(false);
                   }}
                   icon={Save}
                 >
@@ -126,6 +183,46 @@ export default function Profile({ mode = "single" }) {
               </div>
             )}
           </Card>
+          {profile && (
+            <Card className="profile-media-card">
+              <div className="profile-media-copy">
+                <div>
+                  <span className="section-eyebrow">{t("profile.media")}</span>
+                  <strong>{t("profile.mediaHint")}</strong>
+                </div>
+                <ProfileAvatar
+                  profile={profile}
+                  size="default"
+                  showSoundToggle
+                  reduceMotion={settings.reduceMotion}
+                  label={t("profile.username")}
+                  videoLabel={t("profile.avatarVideo")}
+                  muteLabel={t("profile.muteAvatar")}
+                  unmuteLabel={t("profile.unmuteAvatar")}
+                />
+              </div>
+              <input
+                ref={mediaInputRef}
+                className="visually-hidden-input"
+                type="file"
+                accept="image/*,video/*"
+                onChange={handleMediaChange}
+              />
+              <Button
+                variant="quiet"
+                size="sm"
+                icon={Upload}
+                disabled={uploadingMedia}
+                onClick={() => mediaInputRef.current?.click()}
+              >
+                {uploadingMedia
+                  ? t("common.loading")
+                  : profile?.avatar_url || profile?.avatar_path || profile?.avatarUrl
+                    ? t("profile.mediaReplace")
+                    : t("profile.mediaUpload")}
+              </Button>
+            </Card>
+          )}
           <div className="profile-stat-grid">
             <StatCard
               label={t("profile.sessions")}
@@ -253,7 +350,7 @@ export default function Profile({ mode = "single" }) {
                   <span className="status-dot online" />
                   <strong>{t("profile.connected")}</strong>
                 </div>
-                <p>{profile.email || t("nav.signIn")}</p>
+                <p>@{profile.username || profile.displayName}</p>
                 <Button
                   variant="quiet"
                   className="full-button logout-button"

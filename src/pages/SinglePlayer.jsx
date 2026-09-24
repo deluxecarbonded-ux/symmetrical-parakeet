@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
+  Award,
   BrainCircuit,
   Check,
   ChevronRight,
@@ -74,6 +75,22 @@ export default function SinglePlayer() {
               <span>{formatNumber(wallet.single, settings.locale)}</span>
               <small>{t("shop.singleBalance")}</small>
             </div>
+            <LinkButton
+              to="/single/achievements"
+              variant="quiet"
+              size="sm"
+              icon={Award}
+            >
+              {t("nav.achievements")}
+            </LinkButton>
+            <LinkButton
+              to="/single/leaderboard"
+              variant="quiet"
+              size="sm"
+              icon={Trophy}
+            >
+              {t("nav.leaderboard")}
+            </LinkButton>
             <LinkButton
               to="/single/shop"
               variant="quiet"

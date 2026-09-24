@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  Award,
   Check,
   Clock3,
   Copy,
@@ -39,6 +40,7 @@ import {
   WordSlots,
 } from "../components/Primitives";
 import { LettersPad, Numpad } from "../components/AnswerPad";
+import ProfileAvatar from "../components/ProfileMedia";
 import SelectMenu from "../components/SelectMenu";
 import { CATEGORY_LIST } from "../data/puzzles";
 import {
@@ -88,8 +90,6 @@ function CopyCode({ code }) {
 function Lobby({
   settings,
   setSettings,
-  name,
-  setName,
   room,
   currentPlayer,
   onCreate,
@@ -247,13 +247,10 @@ function Lobby({
                 />
               </div>
               <div className="name-field">
-                <label htmlFor="host-name">{t("profile.displayName")}</label>
-                <input
-                  id="host-name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder={t("auth.playerPlaceholder")}
-                />
+                <label htmlFor="host-name">{t("profile.username")}</label>
+                <div className="profile-username-readonly" id="host-name">
+                  @{profile?.username || "—"}
+                </div>
               </div>
               <Button
                 className="full-button"
@@ -369,7 +366,12 @@ function Lobby({
                   <div
                     className={`avatar avatar-player ${player.id === currentPlayer?.id ? "you" : ""}`}
                   >
-                    {player.name.slice(0, 1).toUpperCase()}
+                    <ProfileAvatar
+                      profile={player}
+                      size="small"
+                      reduceMotion={appSettings.reduceMotion}
+                      label={player.name}
+                    />
                   </div>
                   <div className="player-copy">
                     <strong>
@@ -717,7 +719,12 @@ function Match({ room, currentPlayer, onAnswer, onNext, onLeave }) {
                     {formatLocalizedInteger(index + 1, locale)}
                   </span>
                   <div className="avatar avatar-tiny">
-                    {player.name.slice(0, 1).toUpperCase()}
+                    <ProfileAvatar
+                      profile={player}
+                      size="small"
+                      reduceMotion={settings.reduceMotion}
+                      label={player.name}
+                    />
                   </div>
                   <span className="leader-name">
                     {player.name}
@@ -818,7 +825,6 @@ export default function Multiplayer() {
     rounds: 5,
     category: "random",
   });
-  const [name, setName] = useState(profile?.displayName || "");
   const [joinCode, setJoinCode] = useState(params.get("room") || "");
   const [isCreating, setIsCreating] = useState(false);
   const [joinPending, setJoinPending] = useState(false);
@@ -839,8 +845,8 @@ export default function Multiplayer() {
       return;
     if (!profile) return;
     joinedFromUrl.current = true;
-    void multiplayer.joinRoom(requested, name || profile.displayName);
-  }, [currentPlayer, multiplayer, name, params, profile, room]);
+    void multiplayer.joinRoom(requested);
+  }, [currentPlayer, multiplayer, params, profile, room]);
   const create = async () => {
     if (!profile) {
       navigate("/multi/auth?next=/multi");
@@ -848,7 +854,7 @@ export default function Multiplayer() {
     }
     setIsCreating(true);
     try {
-      await multiplayer.createRoom(settings, name || profile.displayName);
+      await multiplayer.createRoom(settings);
     } finally {
       setIsCreating(false);
     }
@@ -860,7 +866,7 @@ export default function Multiplayer() {
     }
     setJoinPending(true);
     try {
-      await multiplayer.joinRoom(joinCode, name || profile.displayName);
+      await multiplayer.joinRoom(joinCode);
     } finally {
       setJoinPending(false);
     }
@@ -887,6 +893,22 @@ export default function Multiplayer() {
         actions={
           <div className="header-action-cluster">
             <LinkButton
+              to="/multi/achievements"
+              variant="quiet"
+              size="sm"
+              icon={Award}
+            >
+              {t("nav.achievements")}
+            </LinkButton>
+            <LinkButton
+              to="/multi/leaderboard"
+              variant="quiet"
+              size="sm"
+              icon={Trophy}
+            >
+              {t("nav.leaderboard")}
+            </LinkButton>
+            <LinkButton
               to="/multi/shop"
               variant="quiet"
               size="sm"
@@ -900,8 +922,6 @@ export default function Multiplayer() {
       <Lobby
         settings={settings}
         setSettings={setSettings}
-        name={name}
-        setName={setName}
         room={room}
         currentPlayer={currentPlayer}
         onCreate={create}

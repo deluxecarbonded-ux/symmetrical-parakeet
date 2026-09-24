@@ -16,11 +16,19 @@ import Multiplayer from "./pages/Multiplayer";
 import Shop from "./pages/Shop";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Achievements from "./pages/Achievements";
+import Leaderboard from "./pages/Leaderboard";
 import Auth from "./pages/Auth";
 import { useMultiplayerRoom } from "./lib/multiplayer";
 import { isSupabaseConfigured, requestAiHint, supabase } from "./lib/supabase";
 import { isRtl, LANGUAGES, translate } from "./i18n/translations";
-import { DEFAULT_PLAYER_NAME, makeId, useMemoryValue } from "./lib/storage";
+import {
+  isValidUsername,
+  normalizeUsername,
+  profileFromAuthUser,
+  publicUsername,
+} from "./lib/identity";
+import { makeId, useMemoryValue } from "./lib/storage";
 
 export const AppContext = createContext(null);
 
@@ -69,6 +77,46 @@ const initialInventory = {
   equipped: { single: null, multi: null },
 };
 
+const MEDIA_EXTENSIONS = {
+  image: {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    avif: "image/avif",
+    heic: "image/heic",
+    heif: "image/heif",
+    svg: "image/svg+xml",
+  },
+  video: {
+    mp4: "video/mp4",
+    m4v: "video/x-m4v",
+    mov: "video/quicktime",
+    webm: "video/webm",
+    ogv: "video/ogg",
+    "3gp": "video/3gpp",
+    "3g2": "video/3gpp2",
+    mkv: "video/x-matroska",
+  },
+};
+
+function resolveMediaType(file) {
+  const declared = String(file?.type || "").toLowerCase().split(";")[0];
+  if (declared.startsWith("image/") || declared.startsWith("video/")) {
+    return { kind: declared.split("/")[0], mimeType: declared };
+  }
+  const extension = String(file?.name || "")
+    .split(".")
+    .pop()
+    ?.toLowerCase();
+  const imageType = MEDIA_EXTENSIONS.image[extension];
+  if (imageType) return { kind: "image", mimeType: imageType };
+  const videoType = MEDIA_EXTENSIONS.video[extension];
+  if (videoType) return { kind: "video", mimeType: videoType };
+  return { kind: "", mimeType: declared };
+}
+
 export default function App() {
   const location = useLocation();
   const activeMode = location.pathname.startsWith("/multi")
@@ -93,11 +141,12 @@ export default function App() {
   );
   const profileView = useMemo(() => {
     if (!profile) return null;
-    const displayName =
-      profile.displayName === DEFAULT_PLAYER_NAME
-        ? t("profile.defaultPlayerName")
-        : profile.displayName;
-    return { ...profile, displayName };
+    const username = publicUsername(profile);
+    return {
+      ...profile,
+      username: username || null,
+      displayName: username || t("profile.defaultPlayerName"),
+    };
   }, [profile, t]);
   const showToast = useCallback((key, values) => {
     setToast({ key, values, id: Date.now() });
@@ -143,14 +192,8 @@ export default function App() {
         };
         setProfiles((current) => ({
           ...current,
-          single:
-            current.single?.id === serverProfile.id
-              ? serverProfile
-              : current.single,
-          multi:
-            current.multi?.id === serverProfile.id
-              ? serverProfile
-              : current.multi,
+          single: serverProfile,
+          multi: serverProfile,
         }));
       }
       const rows = state.single_progress || [];
@@ -600,15 +643,7 @@ export default function App() {
         const { data, error } =
           await supabase.auth.signInWithPassword(credentials);
         if (error) throw error;
-        const next = {
-          id: data.user.id,
-          displayName:
-            data.user.user_metadata?.display_name ||
-            data.user.email?.split("@")[0] ||
-            DEFAULT_PLAYER_NAME,
-          email: data.user.email,
-          createdAt: new Date().toISOString(),
-        };
+        const next = profileFromAuthUser(data.user);
         setProfiles((current) => ({ ...current, single: next, multi: next }));
         return next;
       } catch (error) {
@@ -632,10 +667,8 @@ export default function App() {
         const username = String(credentials.username || "")
           .trim()
           .toLowerCase();
-        const displayName =
-          String(credentials.name || username).trim() || username;
-        if (!username) {
-          showToast("auth.signupValidation");
+        if (!isValidUsername(username)) {
+          showToast("auth.usernameInvalid");
           return null;
         }
         const { data, error } = await supabase.auth.signUp({
@@ -645,7 +678,7 @@ export default function App() {
           password: credentials.password,
           options: {
             data: {
-              display_name: displayName,
+              display_name: username,
               username,
               locale: settings.locale,
             },
@@ -658,9 +691,8 @@ export default function App() {
         }
         const next = {
           id: data.user.id,
-          displayName,
+          displayName: username,
           username,
-          email: credentials.email,
           createdAt: new Date().toISOString(),
         };
         if (data.user)
@@ -718,27 +750,11 @@ export default function App() {
           single:
             current.single?.id === user.id
               ? current.single
-              : {
-                  id: user.id,
-                  displayName:
-                    user.user_metadata?.display_name ||
-                    user.email?.split("@")[0] ||
-                    DEFAULT_PLAYER_NAME,
-                  email: user.email,
-                  createdAt: new Date().toISOString(),
-                },
+              : profileFromAuthUser(user),
           multi:
             current.multi?.id === user.id
               ? current.multi
-              : {
-                  id: user.id,
-                  displayName:
-                    user.user_metadata?.display_name ||
-                    user.email?.split("@")[0] ||
-                    DEFAULT_PLAYER_NAME,
-                  email: user.email,
-                  createdAt: new Date().toISOString(),
-                },
+              : profileFromAuthUser(user),
         }));
     });
     return undefined;
@@ -758,15 +774,7 @@ export default function App() {
           return;
         }
         if (session?.user && profile?.id !== session.user.id) {
-          const next = {
-            id: session.user.id,
-            displayName:
-              session.user.user_metadata?.display_name ||
-              session.user.email?.split("@")[0] ||
-              DEFAULT_PLAYER_NAME,
-            email: session.user.email,
-            createdAt: new Date().toISOString(),
-          };
+          const next = profileFromAuthUser(session.user);
           setProfiles((current) => ({ ...current, single: next, multi: next }));
         }
       },
@@ -783,28 +791,111 @@ export default function App() {
     hydrateFromSupabase();
   }, [profile?.id, hydrateFromSupabase]);
 
-  const saveDisplayName = useCallback(
-    (name) => {
-      const nextName = name.trim();
-      setActiveProfile((current) =>
-        current
-          ? { ...current, displayName: nextName || current.displayName }
-          : current,
-      );
-      if (isSupabaseConfigured && profile && nextName) {
-        supabase
-          .rpc("update_profile_display_name", { p_display_name: nextName })
-          .then(async ({ data, error }) => {
-            if (error) showToast("toast.syncUnavailable");
-            else {
-              if (data) setActiveProfile(data);
-              await hydrateFromSupabase();
-            }
-          });
+  const saveUsername = useCallback(
+    async (value) => {
+      const username = normalizeUsername(value);
+      if (!isValidUsername(username)) {
+        showToast("profile.usernameInvalid");
+        return false;
       }
+      if (publicUsername(profile) === username) {
+        showToast("profile.saved");
+        return true;
+      }
+      if (isSupabaseConfigured && profile) {
+        const { data, error } = await supabase.rpc("update_profile_username", {
+          p_username: username,
+        });
+        if (error) {
+          const message = String(error.message || error).toLowerCase();
+          showToast(
+            message.includes("username") || message.includes("unique")
+              ? "profile.usernameTaken"
+              : "toast.syncUnavailable",
+          );
+          await hydrateFromSupabase();
+          return false;
+        }
+        if (data) {
+          setProfiles((current) => ({
+            ...current,
+            single: current.single ? { ...current.single, ...data } : current.single,
+            multi: current.multi ? { ...current.multi, ...data } : current.multi,
+          }));
+        }
+        await hydrateFromSupabase();
+        showToast("profile.saved");
+        return true;
+      }
+      setProfiles((current) => ({
+        ...current,
+        single: current.single
+          ? { ...current.single, username, displayName: username }
+          : current.single,
+        multi: current.multi
+          ? { ...current.multi, username, displayName: username }
+          : current.multi,
+      }));
       showToast("profile.saved");
+      return true;
     },
-    [hydrateFromSupabase, profile, setActiveProfile, showToast],
+    [hydrateFromSupabase, profile, setProfiles, showToast],
+  );
+
+  const uploadAvatar = useCallback(
+    async (file) => {
+      if (!profile || !file || !isSupabaseConfigured) return null;
+      const mediaType = resolveMediaType(file);
+      const isVideo = mediaType.kind === "video";
+      const isImage = mediaType.kind === "image";
+      if ((!isVideo && !isImage) || file.size > 25 * 1024 * 1024) {
+        showToast("profile.mediaInvalid");
+        return null;
+      }
+      const bucket = isVideo ? "profile-media" : "avatars";
+      const extension =
+        file.name
+          .split(".")
+          .pop()
+          ?.toLowerCase()
+          .replace(/[^a-z0-9]/g, "") || (isVideo ? "mp4" : "jpg");
+      const unique = globalThis.crypto?.randomUUID?.() || `${Date.now()}`;
+      const path = `${profile.id}/avatar-${unique}.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(path, file, { upsert: false, contentType: mediaType.mimeType });
+      if (uploadError) {
+        showToast("profile.mediaUploadFailed");
+        return null;
+      }
+      const { data, error } = await supabase.rpc("update_profile_avatar", {
+        p_bucket: bucket,
+        p_path: path,
+        p_mime_type: mediaType.mimeType,
+      });
+      if (error || !data) {
+        await supabase.storage.from(bucket).remove([path]);
+        showToast("profile.mediaUploadFailed");
+        return null;
+      }
+      const previousPath = profile.avatar_url || profile.avatar_path;
+      const previousBucket = profile.avatar_bucket || "avatars";
+      if (
+        previousPath &&
+        previousPath !== path &&
+        /^(avatars|profile-media)$/i.test(previousBucket)
+      ) {
+        await supabase.storage.from(previousBucket).remove([previousPath]);
+      }
+      setProfiles((current) => ({
+        ...current,
+        single: current.single ? { ...current.single, ...data } : current.single,
+        multi: current.multi ? { ...current.multi, ...data } : current.multi,
+      }));
+      showToast("profile.mediaUpdated");
+      return data;
+    },
+    [activeMode, profile, setProfiles, showToast],
   );
 
   const resetProgress = useCallback(async () => {
@@ -883,7 +974,8 @@ export default function App() {
       recordSingleWin,
       purchaseItem,
       equipItem,
-      saveDisplayName,
+      saveUsername,
+      uploadAvatar,
       resetProgress,
       getAiHint,
       playCue,
@@ -905,7 +997,8 @@ export default function App() {
       purchaseItem,
       recordSingleWin,
       resetProgress,
-      saveDisplayName,
+      saveUsername,
+      uploadAvatar,
       settings,
       showToast,
       signIn,
@@ -927,16 +1020,22 @@ export default function App() {
           <Route path="single/play" element={<SingleGame />} />
           <Route path="single/shop" element={<Shop mode="single" />} />
           <Route path="single/profile" element={<Profile mode="single" />} />
+          <Route path="single/achievements" element={<Achievements mode="single" />} />
+          <Route path="single/leaderboard" element={<Leaderboard mode="single" />} />
           <Route path="multi" element={<Multiplayer />} />
           <Route path="multi/play" element={<Multiplayer />} />
           <Route path="multi/shop" element={<Shop mode="multi" />} />
           <Route path="multi/profile" element={<Profile mode="multi" />} />
+          <Route path="multi/achievements" element={<Achievements mode="multi" />} />
+          <Route path="multi/leaderboard" element={<Leaderboard mode="multi" />} />
           <Route path="shop" element={<Navigate to="/single/shop" replace />} />
           <Route
             path="profile"
             element={<Navigate to="/single/profile" replace />}
           />
           <Route path="settings" element={<Settings />} />
+          <Route path="achievements" element={<Navigate to="/single/achievements" replace />} />
+          <Route path="leaderboard" element={<Navigate to="/single/leaderboard" replace />} />
         </Route>
         <Route path="auth" element={<Auth />} />
         <Route path="single/auth" element={<Auth scope="single" />} />

@@ -137,10 +137,18 @@ function mapRoomRows({
     .map((row) => ({
       id: String(row?.profile_id || row?.profileId || row?.id || ""),
       profileId: String(row?.profile_id || row?.profileId || row?.id || ""),
-      name: String(row?.display_name || row?.displayName || fallbackName),
+      username: String(
+        row?.username || row?.user_name || row?.display_name || row?.displayName || fallbackName,
+      ),
+      name: String(
+        row?.username || row?.user_name || row?.display_name || row?.displayName || fallbackName,
+      ),
       ready: Boolean(row?.ready),
       score: finiteNumber(row?.score, 0),
       codes: finiteNumber(row?.codes_cracked ?? row?.codesCracked, 0),
+      avatar_url: row?.avatar_url || row?.avatarUrl || null,
+      avatar_bucket: row?.avatar_bucket || row?.avatarBucket || null,
+      avatar_media_type: row?.avatar_media_type || row?.avatarMediaType || null,
       joinedAt: row?.joined_at || row?.joinedAt || null,
     }))
     .filter((player) => player.id)
@@ -363,11 +371,11 @@ export function useMultiplayerRoom({
         : roomResult?.data;
       if (!roomRow?.id) return null;
 
-      const [playersResult, roundsResult] = await Promise.all([
+      const [initialPlayersResult, roundsResult] = await Promise.all([
         supabase
           .from("multiplayer_players")
           .select(
-            "room_id,profile_id,display_name,ready,score,codes_cracked,joined_at",
+            "room_id,profile_id,username,display_name,ready,score,codes_cracked,avatar_url,avatar_bucket,avatar_media_type,joined_at",
           )
           .eq("room_id", roomRow.id)
           .order("joined_at", { ascending: true }),
@@ -379,6 +387,19 @@ export function useMultiplayerRoom({
           .eq("room_id", roomRow.id)
           .order("round_number", { ascending: true }),
       ]);
+      let playersResult = initialPlayersResult;
+      if (
+        playersResult?.error &&
+        /column|avatar|username|relation/i.test(String(playersResult.error.message || ""))
+      ) {
+        playersResult = await supabase
+          .from("multiplayer_players")
+          .select(
+            "room_id,profile_id,display_name,ready,score,codes_cracked,joined_at",
+          )
+          .eq("room_id", roomRow.id)
+          .order("joined_at", { ascending: true });
+      }
       if (playersResult?.error) throw playersResult.error;
       if (roundsResult?.error) throw roundsResult.error;
 
@@ -406,10 +427,16 @@ export function useMultiplayerRoom({
         playerRows: playersResult?.data,
         roundRows,
         puzzleRows,
-        fallbackName: profile?.displayName || defaultName,
+        fallbackName: profile?.username || profile?.displayName || defaultName,
       });
     },
-    [canUseRemote, defaultName, getAuthenticatedUser, profile?.displayName],
+    [
+      canUseRemote,
+      defaultName,
+      getAuthenticatedUser,
+      profile?.displayName,
+      profile?.username,
+    ],
   );
 
   const refreshRoom = useCallback(
@@ -1119,7 +1146,11 @@ export function useMultiplayerRoom({
         id: profileId,
         name:
           String(
-            name || currentPlayer?.name || profile.displayName || defaultName,
+            name ||
+              currentPlayer?.name ||
+              profile.username ||
+              profile.displayName ||
+              defaultName,
           ).trim() ||
           defaultName ||
           "Player",
