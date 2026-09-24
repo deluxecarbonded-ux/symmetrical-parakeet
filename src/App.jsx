@@ -114,6 +114,9 @@ export default function App() {
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [languageMenuClosing, setLanguageMenuClosing] = useState(false);
   const languageCloseTimer = useRef(null);
+  const themeTransitionTimer = useRef(null);
+  const previousThemeRef = useRef(null);
+  const firstThemeEffectRef = useRef(true);
   const onLanguageMenuChange = useCallback((open) => {
     if (languageCloseTimer.current) {
       window.clearTimeout(languageCloseTimer.current);
@@ -279,6 +282,28 @@ export default function App() {
 
   useEffect(() => {
     const root = document.documentElement;
+    const themeChanged =
+      previousThemeRef.current !== null &&
+      previousThemeRef.current !== settings.theme;
+    const shouldAnimateTheme =
+      !firstThemeEffectRef.current && themeChanged && !settings.reduceMotion;
+    firstThemeEffectRef.current = false;
+    previousThemeRef.current = settings.theme;
+
+    if (themeTransitionTimer.current) {
+      window.clearTimeout(themeTransitionTimer.current);
+      themeTransitionTimer.current = null;
+    }
+    if (shouldAnimateTheme) {
+      root.classList.add("theme-transition");
+      themeTransitionTimer.current = window.setTimeout(() => {
+        root.classList.remove("theme-transition");
+        themeTransitionTimer.current = null;
+      }, 420);
+    } else if (settings.reduceMotion) {
+      root.classList.remove("theme-transition");
+    }
+
     root.dataset.theme = settings.theme;
     root.dataset.reduceMotion = String(Boolean(settings.reduceMotion));
     root.lang = settings.locale;
@@ -288,6 +313,13 @@ export default function App() {
     const description = document.querySelector('meta[name="description"]');
     if (description) description.setAttribute("content", t("meta.description"));
   }, [settings.locale, settings.reduceMotion, settings.theme, t]);
+
+  useEffect(() => {
+    return () => {
+      if (themeTransitionTimer.current)
+        window.clearTimeout(themeTransitionTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!toast) return undefined;

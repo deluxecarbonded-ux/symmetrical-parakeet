@@ -4615,6 +4615,26 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+:root.theme-transition,
+:root.theme-transition *,
+:root.theme-transition *::before,
+:root.theme-transition *::after {
+  transition-property:
+    background-color, color, border-color, box-shadow, fill, stroke;
+  transition-duration: 360ms;
+  transition-timing-function: ease;
+}
+:root.theme-transition .app-shell {
+  animation: themeFade 360ms ease both;
+}
+@keyframes themeFade {
+  from {
+    opacity: 0.88;
+  }
+  to {
+    opacity: 1;
+  }
+}
 :root[data-reduce-motion="true"] {
   scroll-behavior: auto !important;
 }
