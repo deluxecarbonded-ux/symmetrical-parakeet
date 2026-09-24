@@ -58,7 +58,7 @@ The app requires Supabase environment variables and does not fall back to browse
    npx supabase functions deploy ai-riddle --project-ref <PROJECT_REF>
    npx supabase functions deploy multiplayer-action --project-ref <PROJECT_REF>
    ```
-7. Add `OPENROUTER_API_KEY` as an Edge Function secret. The AI function tries free OpenRouter models in order and moves to the next model on a 429 response. The API key is never exposed to the browser.
+7. Add `OPENROUTER_API_KEY` and `APP_URL` as Edge Function secrets. The AI function discovers currently available zero-cost `:free` models, caches that catalog briefly, and automatically falls through on rate limits, expired models, timeouts, or provider outages. The API key is never exposed to the browser.
 
 Because the browser storage policy is strict, the Supabase client keeps the auth session in memory only (`persistSession: false`); a page reload requires signing in again. This avoids localStorage/sessionStorage while keeping all durable state in Postgres.
 
