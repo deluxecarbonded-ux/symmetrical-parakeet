@@ -4615,10 +4615,15 @@ select {
     transition-duration: 0.01ms !important;
   }
 }
+:root[data-reduce-motion="true"] {
+  scroll-behavior: auto !important;
+}
 :root[data-reduce-motion="true"] *,
 :root[data-reduce-motion="true"] *::before,
 :root[data-reduce-motion="true"] *::after {
   animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
   transition-duration: 0.01ms !important;
 }
 

@@ -43,7 +43,9 @@ const initialSettings = {
       : "light",
   locale: supportedLocale || "en",
   sound: true,
-  reduceMotion: false,
+  reduceMotion:
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
 };
 
 const initialProgress = {
@@ -278,13 +280,14 @@ export default function App() {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = settings.theme;
+    root.dataset.reduceMotion = String(Boolean(settings.reduceMotion));
     root.lang = settings.locale;
     root.dir = isRtl(settings.locale) ? "rtl" : "ltr";
     root.style.colorScheme = settings.theme;
     document.title = t("meta.title");
     const description = document.querySelector('meta[name="description"]');
     if (description) description.setAttribute("content", t("meta.description"));
-  }, [settings.locale, settings.theme, t]);
+  }, [settings.locale, settings.reduceMotion, settings.theme, t]);
 
   useEffect(() => {
     if (!toast) return undefined;
