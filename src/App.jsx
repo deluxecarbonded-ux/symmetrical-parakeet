@@ -127,9 +127,13 @@ export default function App() {
         setProfiles((current) => ({
           ...current,
           single:
-            current.single?.id === serverProfile.id ? serverProfile : current.single,
+            current.single?.id === serverProfile.id
+              ? serverProfile
+              : current.single,
           multi:
-            current.multi?.id === serverProfile.id ? serverProfile : current.multi,
+            current.multi?.id === serverProfile.id
+              ? serverProfile
+              : current.multi,
         }));
       }
       const rows = state.single_progress || [];
@@ -200,7 +204,8 @@ export default function App() {
         multi: {
           matches: state.multiplayer_profile?.duels_played ?? 0,
           wins: state.multiplayer_profile?.duels_won ?? 0,
-          solved: multiHistory.filter((event) => event.round !== undefined).length,
+          solved: multiHistory.filter((event) => event.round !== undefined)
+            .length,
           score: multiHistory.reduce(
             (sum, event) => sum + (event.score || 0),
             0,
@@ -373,76 +378,79 @@ export default function App() {
         isSupabaseConfigured && profile && !profile.isGuest,
       );
       if (!shouldPersist) {
-      setProgress((current) => {
-        const single = current.single || initialProgress.single;
-        const completed = { ...(single.completed || {}) };
-        completed[difficulty] = Array.from(
-          new Set([...(completed[difficulty] || []), level]),
-        ).sort((a, b) => a - b);
-        const bestScores = {
-          ...(single.bestScores || {}),
-          [difficulty]: Math.max(single.bestScores?.[difficulty] || 0, score),
-        };
-        const currentLevel = {
-          ...(single.currentLevel || initialProgress.single.currentLevel),
-        };
-        currentLevel[difficulty] = Math.min(
-          30,
-          Math.max(level + 1, currentLevel[difficulty] || 1),
-        );
-        return {
+        setProgress((current) => {
+          const single = current.single || initialProgress.single;
+          const completed = { ...(single.completed || {}) };
+          completed[difficulty] = Array.from(
+            new Set([...(completed[difficulty] || []), level]),
+          ).sort((a, b) => a - b);
+          const bestScores = {
+            ...(single.bestScores || {}),
+            [difficulty]: Math.max(single.bestScores?.[difficulty] || 0, score),
+          };
+          const currentLevel = {
+            ...(single.currentLevel || initialProgress.single.currentLevel),
+          };
+          currentLevel[difficulty] = Math.min(
+            30,
+            Math.max(level + 1, currentLevel[difficulty] || 1),
+          );
+          return {
+            ...current,
+            single: {
+              ...single,
+              completed,
+              bestScores,
+              currentLevel,
+              solved: (single.solved || 0) + 1,
+              score: (single.score || 0) + score,
+              attempts: (single.attempts || 0) + attempts,
+              history: [
+                {
+                  id: makeId("run"),
+                  difficulty,
+                  level,
+                  score,
+                  attempts,
+                  time,
+                  answer: answer || code,
+                  answerType: answerType || "digits",
+                  code: code || null,
+                  at: new Date().toISOString(),
+                },
+                ...(single.history || []),
+              ].slice(0, 20),
+            },
+          };
+        });
+        setWallet((current) => ({
           ...current,
-          single: {
-            ...single,
-            completed,
-            bestScores,
-            currentLevel,
-            solved: (single.solved || 0) + 1,
-            score: (single.score || 0) + score,
-            attempts: (single.attempts || 0) + attempts,
-            history: [
-              {
-                id: makeId("run"),
-                difficulty,
-                level,
-                score,
-                attempts,
-                time,
-                answer: answer || code,
-                answerType: answerType || "digits",
-                code: code || null,
-                at: new Date().toISOString(),
-              },
-              ...(single.history || []),
-            ].slice(0, 20),
-          },
-        };
-      });
-      setWallet((current) => ({
-        ...current,
-        single: (current.single || 0) + coins,
-      }));
-      addActivity({
-        type: "single",
-        difficulty,
-        level,
-        score,
-        coins,
-        at: new Date().toISOString(),
-      });
+          single: (current.single || 0) + coins,
+        }));
+        addActivity({
+          type: "single",
+          difficulty,
+          level,
+          score,
+          coins,
+          at: new Date().toISOString(),
+        });
       }
       if (!shouldPersist) {
         showToast("single.correct");
         return true;
       }
-      const { data, error } = await supabase.rpc("submit_single_answer_localized", {
-        p_difficulty: difficulty,
-        p_level: level,
-        p_answer: submittedAnswer || answer || code || "",
-        p_locale: settings.locale,
-        p_attempts: attempts,
-        p_time_ms: time * 1000,
-      });
+      const { data, error } = await supabase.rpc(
+        "submit_single_answer_localized",
+        {
+          p_difficulty: difficulty,
+          p_level: level,
+          p_answer: submittedAnswer || answer || code || "",
+          p_locale: settings.locale,
+          p_attempts: attempts,
+          p_time_ms: time * 1000,
+        },
+      );
       if (error || data?.correct === false) {
         showToast("toast.syncUnavailable");
         return false;
@@ -462,19 +470,13 @@ export default function App() {
     ],
   );
 
-  const recordMultiRound = useCallback(
-    async () => {
-      await hydrateFromSupabase();
-    },
-    [hydrateFromSupabase],
-  );
+  const recordMultiRound = useCallback(async () => {
+    await hydrateFromSupabase();
+  }, [hydrateFromSupabase]);
 
-  const recordMultiMatch = useCallback(
-    async () => {
-      await hydrateFromSupabase();
-    },
-    [hydrateFromSupabase],
-  );
+  const recordMultiMatch = useCallback(async () => {
+    await hydrateFromSupabase();
+  }, [hydrateFromSupabase]);
 
   const recordMultiRoundSafe = useCallback(
     (payload) => {
@@ -616,19 +618,37 @@ export default function App() {
           showToast("toast.syncUnavailable");
           return null;
         }
+        const username = String(credentials.username || "")
+          .trim()
+          .toLowerCase();
+        const displayName =
+          String(credentials.name || username).trim() || username;
+        if (!username) {
+          showToast("auth.signupValidation");
+          return null;
+        }
         const { data, error } = await supabase.auth.signUp({
-          email: credentials.email,
+          email: String(credentials.email || "")
+            .trim()
+            .toLowerCase(),
           password: credentials.password,
-          options: { data: { display_name: credentials.name } },
+          options: {
+            data: {
+              display_name: displayName,
+              username,
+              locale: settings.locale,
+            },
+          },
         });
         if (error) throw error;
         if (!data.user || !data.session) {
-          showToast("auth.invalidCredentials");
+          showToast("auth.signupFailed");
           return null;
         }
         const next = {
           id: data.user.id,
-          displayName: credentials.name,
+          displayName,
+          username,
           email: credentials.email,
           isGuest: false,
           createdAt: new Date().toISOString(),
@@ -641,13 +661,24 @@ export default function App() {
           }));
         return data.user ? next : null;
       } catch (error) {
-        showToast("auth.invalidCredentials");
+        const message = String(error?.message || error || "").toLowerCase();
+        if (message.includes("username") || message.includes("unique")) {
+          showToast("auth.usernameTaken");
+        } else if (
+          message.includes("email") ||
+          message.includes("registered") ||
+          message.includes("already")
+        ) {
+          showToast("auth.emailTaken");
+        } else {
+          showToast("auth.signupFailed");
+        }
         return null;
       } finally {
         setAuthBusy(false);
       }
     },
-    [setProfiles, showToast],
+    [setProfiles, settings.locale, showToast],
   );
 
   const signOut = useCallback(async () => {
@@ -658,7 +689,14 @@ export default function App() {
     setWallet(initialWallet);
     setInventory(initialInventory);
     setActivity([]);
-  }, [setActivity, setInventory, setProgress, setProfiles, setSettings, setWallet]);
+  }, [
+    setActivity,
+    setInventory,
+    setProgress,
+    setProfiles,
+    setSettings,
+    setWallet,
+  ]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) return undefined;

@@ -49,7 +49,7 @@ function Brand({ compact = false }) {
       <span className="brand-mark">
         <Sparkles size={18} strokeWidth={2.4} />
       </span>
-      <span className="brand-word">EXOTIC</span>
+      <span className="brand-word">{t("app.wordmark")}</span>
       <span className="brand-dot">.</span>
     </button>
   );
