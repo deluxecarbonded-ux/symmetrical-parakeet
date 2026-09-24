@@ -517,7 +517,17 @@ export function getSafeAvatarMediaType(row = {}) {
     return "video/mp4";
   }
   if (bucket === "avatars" || /\.(jpe?g|png|webp|gif|avif|heic|heif|svg)$/i.test(source)) {
-    return "image/jpeg";
+    const extension = String(source).split(".").pop()?.toLowerCase();
+    const imageTypes = {
+      gif: "image/gif",
+      webp: "image/webp",
+      avif: "image/avif",
+      svg: "image/svg+xml",
+      png: "image/png",
+      heic: "image/heic",
+      heif: "image/heif",
+    };
+    return imageTypes[extension] || "image/jpeg";
   }
   return "";
 }
@@ -1247,10 +1257,10 @@ export const gameDataStyles = `
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .achievement-card,
-  .global-leaderboard-row,
-  .achievement-skeleton-line,
-  .leaderboard-skeleton-block {
+  :root:not([data-reduce-motion]) .achievement-card,
+  :root:not([data-reduce-motion]) .global-leaderboard-row,
+  :root:not([data-reduce-motion]) .achievement-skeleton-line,
+  :root:not([data-reduce-motion]) .leaderboard-skeleton-block {
     animation: none !important;
     transition: none !important;
     transform: none !important;

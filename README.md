@@ -42,6 +42,10 @@ npm run check:i18n
 
 The app requires Supabase environment variables and does not fall back to browser persistence. Configure `.env` from `.env.example`, link the CLI, push migrations and seeds, and deploy the Edge Functions before running the app.
 
+## Vercel deployment
+
+`vercel.json` configures the Vite build and SPA route fallback. Before deploying, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or `VITE_SUPABASE_ANON_KEY`) in the Vercel project's Environment Variables. Never add the Supabase service-role key or database password to Vercel.
+
 ## Supabase setup
 
 1. Install the Supabase CLI and authenticate with a **personal access token**:
@@ -63,7 +67,7 @@ The app requires Supabase environment variables and does not fall back to browse
    npx supabase functions deploy ai-riddle --project-ref <PROJECT_REF>
    npx supabase functions deploy multiplayer-action --project-ref <PROJECT_REF>
    ```
-6. Add `OPENROUTER_API_KEY` and `APP_URL` as Edge Function secrets. The AI function discovers currently available zero-cost `:free` models, caches that catalog briefly, and automatically falls through on rate limits, expired models, timeouts, or provider outages. The API key is never exposed to the browser.
+6. Add `OPENROUTER_API_KEY` and `APP_URL` as Edge Function secrets. Set `APP_URL` to the deployed Vercel origin (for example, `https://your-app.vercel.app`). The AI function discovers currently available zero-cost `:free` models, caches that catalog briefly, and automatically falls through on rate limits, expired models, timeouts, or provider outages. The API key is never exposed to the browser.
 
 Because the browser storage policy is strict, the Supabase client keeps the auth session in memory only (`persistSession: false`); a page reload requires signing in again. This avoids localStorage/sessionStorage while keeping all durable state in Postgres.
 

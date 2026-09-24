@@ -94,6 +94,13 @@ function avatarTone(row) {
   return "blue";
 }
 
+function isAnimatedImage(mediaType, source) {
+  return (
+    /^image\/(gif|webp|avif|svg\+xml)$/i.test(mediaType || "") ||
+    /\.(gif|webp|avif|svg)(?:[?#].*)?$/i.test(source || "")
+  );
+}
+
 function SafeAvatar({ row, reduceMotion }) {
   const [failed, setFailed] = useState(false);
   const source = getSafeAvatarUrl(row);
@@ -108,7 +115,13 @@ function SafeAvatar({ row, reduceMotion }) {
 
   // A paused video can still animate while loading in some browsers.  Use the
   // safe initials fallback when the user has explicitly reduced motion.
-  if (!source || !mediaType || failed || (isVideo && reduceMotion)) {
+  if (
+    !source ||
+    !mediaType ||
+    failed ||
+    (isVideo && reduceMotion) ||
+    (!isVideo && reduceMotion && isAnimatedImage(mediaType, source))
+  ) {
     return (
       <span
         className={`leaderboard-avatar-fallback ${avatarTone(row)}`}

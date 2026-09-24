@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -260,12 +261,23 @@ export default function App() {
       return;
     }
     setLanguageMenuOpen(false);
+    if (settings.reduceMotion) {
+      setLanguageMenuClosing(false);
+      return;
+    }
     setLanguageMenuClosing(true);
     languageCloseTimer.current = window.setTimeout(() => {
       setLanguageMenuClosing(false);
       languageCloseTimer.current = null;
     }, 240);
-  }, []);
+  }, [settings.reduceMotion]);
+
+  useEffect(() => {
+    if (!settings.reduceMotion || !languageCloseTimer.current) return;
+    window.clearTimeout(languageCloseTimer.current);
+    languageCloseTimer.current = null;
+    setLanguageMenuClosing(false);
+  }, [settings.reduceMotion]);
 
   const hydrateFromSupabase = useCallback(async ({ silent = false } = {}) => {
     if (!isSupabaseConfigured) return;
@@ -472,6 +484,15 @@ export default function App() {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = settings.theme;
+    root.dataset.reduceMotion = String(Boolean(settings.reduceMotion));
+    root.lang = settings.locale;
+    root.dir = isRtl(settings.locale) ? "rtl" : "ltr";
+    root.style.colorScheme = settings.theme;
+  }, [settings.locale, settings.reduceMotion, settings.theme]);
+
   useEffect(() => {
     const root = document.documentElement;
     const themeChanged =
@@ -517,7 +538,7 @@ export default function App() {
     (patch) => {
       setSettings((current) => {
         const next = { ...current, ...patch };
-        if (profile?.id && settingsHydratedRef.current) {
+        if (profile?.id) {
           preferencesDirtyRef.current = true;
         }
         return next;

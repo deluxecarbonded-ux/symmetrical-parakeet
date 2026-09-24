@@ -225,6 +225,8 @@ function ToggleRow({ icon: Icon, title, description, value, onChange }) {
       <button
         className={`toggle ${value ? "on" : ""}`}
         onClick={() => onChange(!value)}
+        type="button"
+        aria-pressed={value}
         aria-label={title}
       >
         <span />

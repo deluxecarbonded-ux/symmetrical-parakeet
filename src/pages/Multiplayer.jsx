@@ -69,6 +69,13 @@ const modes = [
 function CopyCode({ code }) {
   const { t, showToast } = useApp();
   const [copied, setCopied] = useState(false);
+  const copiedTimer = useRef(null);
+  useEffect(
+    () => () => {
+      if (copiedTimer.current) window.clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(code);
@@ -77,7 +84,11 @@ function CopyCode({ code }) {
     }
     setCopied(true);
     showToast("toast.copied");
-    window.setTimeout(() => setCopied(false), 1600);
+    if (copiedTimer.current) window.clearTimeout(copiedTimer.current);
+    copiedTimer.current = window.setTimeout(() => {
+      setCopied(false);
+      copiedTimer.current = null;
+    }, 1600);
   };
   return (
     <button className="copy-code" onClick={copy}>
@@ -424,6 +435,13 @@ function RoomLobby({ room, currentPlayer, isHost, canStart, host, shareUrl }) {
   const locale = settings.locale || "en";
   const { toggleReady, startMatch, leaveRoom } = useApp().multiplayer;
   const [copiedLink, setCopiedLink] = useState(false);
+  const copiedLinkTimer = useRef(null);
+  useEffect(
+    () => () => {
+      if (copiedLinkTimer.current) window.clearTimeout(copiedLinkTimer.current);
+    },
+    [],
+  );
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -431,7 +449,11 @@ function RoomLobby({ room, currentPlayer, isHost, canStart, host, shareUrl }) {
       /* noop */
     }
     setCopiedLink(true);
-    window.setTimeout(() => setCopiedLink(false), 1500);
+    if (copiedLinkTimer.current) window.clearTimeout(copiedLinkTimer.current);
+    copiedLinkTimer.current = window.setTimeout(() => {
+      setCopiedLink(false);
+      copiedLinkTimer.current = null;
+    }, 1500);
   };
   return (
     <Card className="active-room-card">

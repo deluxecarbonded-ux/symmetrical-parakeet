@@ -1,5 +1,6 @@
 import { Check, ChevronDown } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useReducedMotion } from "../lib/motion";
 
 export default function SelectMenu({
   value,
@@ -10,7 +11,9 @@ export default function SelectMenu({
   placeholder = "Select",
   className = "",
   disabled = false,
+  reduceMotion = false,
 }) {
+  const globalReduceMotion = useReducedMotion(reduceMotion);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -48,15 +51,23 @@ export default function SelectMenu({
         setMounted(false);
         setClosing(false);
         closeTimer.current = null;
-      }, 180);
+      }, globalReduceMotion ? 0 : 180);
       if (returnFocus) {
         window.requestAnimationFrame(() =>
           rootRef.current?.querySelector("button")?.focus(),
         );
       }
     },
-    [mounted, onOpenChange, open],
+    [globalReduceMotion, mounted, onOpenChange, open],
   );
+
+  useEffect(() => {
+    if (!globalReduceMotion || !closeTimer.current) return;
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = null;
+    setMounted(false);
+    setClosing(false);
+  }, [globalReduceMotion]);
 
   useEffect(() => {
     return () => {

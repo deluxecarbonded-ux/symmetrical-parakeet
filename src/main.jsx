@@ -5,6 +5,12 @@ import App from "./App";
 import { LANGUAGES, translate } from "./i18n/translations";
 import "./styles.css";
 
+if (typeof document !== "undefined") {
+  document.documentElement.dataset.reduceMotion = String(
+    Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches),
+  );
+}
+
 function getErrorCopy() {
   const browserLocale =
     typeof navigator !== "undefined" ? navigator.language?.slice(0, 2) : "en";

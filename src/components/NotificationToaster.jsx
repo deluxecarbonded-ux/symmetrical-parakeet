@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useApp } from "../App";
 import { notificationDuration } from "../lib/notifications";
+import { useReducedMotion } from "../lib/motion";
 
 const toneDetails = {
   success: { Icon: CheckCircle2, titleKey: "notifications.success" },
@@ -82,7 +83,8 @@ export default function NotificationToaster() {
   const [paused, setPaused] = useState(false);
   const autoTimers = useRef(new Map());
   const dismissTimers = useRef(new Map());
-  const reduceMotion = Boolean(settings?.reduceMotion);
+  const globalReduceMotion = useReducedMotion();
+  const reduceMotion = Boolean(settings?.reduceMotion || globalReduceMotion);
 
   const beginDismiss = useCallback(
     (id) => {

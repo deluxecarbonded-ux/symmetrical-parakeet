@@ -1,6 +1,7 @@
 import { Volume2, VolumeX } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getInitials } from "../lib/storage";
+import { useReducedMotion } from "../lib/motion";
 import { supabase } from "../lib/supabase";
 
 function mediaUrl(profile) {
@@ -13,6 +14,16 @@ function mediaUrl(profile) {
   const path = value.replace(/^\/+/, "");
   if (!path || !/^[A-Za-z0-9._/-]+$/.test(path)) return null;
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+
+function isAnimatedImage(profile, source) {
+  const type = String(
+    profile?.avatar_media_type || profile?.avatarMediaType || "",
+  ).toLowerCase();
+  return (
+    /^image\/(gif|webp|avif|svg\+xml)$/i.test(type) ||
+    /\.(gif|webp|avif|svg)(?:[?#].*)?$/i.test(source || "")
+  );
 }
 
 function isVideo(profile, source) {
@@ -36,10 +47,27 @@ export function ProfileAvatar({
 }) {
   const [muted, setMuted] = useState(true);
   const [failed, setFailed] = useState(false);
+  const videoRef = useRef(null);
+  const globalReduceMotion = useReducedMotion(reduceMotion);
   const rawSource = mediaUrl(profile);
   const source = failed ? null : rawSource;
   useEffect(() => setFailed(false), [rawSource]);
   const video = isVideo(profile, source);
+  const animatedImage = !video && isAnimatedImage(profile, source);
+
+  useEffect(() => {
+    const element = videoRef.current;
+    if (!element) return;
+    if (globalReduceMotion) {
+      element.pause();
+      element.muted = true;
+      setMuted(true);
+      return;
+    }
+    if (video && element.paused) {
+      element.play().catch(() => {});
+    }
+  }, [globalReduceMotion, rawSource, video]);
   const username =
     profile?.username || profile?.displayName || profile?.display_name || "";
   const initials = username ? getInitials(username) : "?";
@@ -53,17 +81,18 @@ export function ProfileAvatar({
     >
       {source && video ? (
         <video
+          ref={videoRef}
           src={source}
           muted={muted}
-          autoPlay={!reduceMotion}
-          loop={!reduceMotion}
+          autoPlay={!globalReduceMotion}
+          loop={!globalReduceMotion}
           playsInline
-          controls={reduceMotion && showSoundToggle}
+          controls={globalReduceMotion && showSoundToggle}
           preload="metadata"
           aria-label={videoAccessibleName}
           onError={() => setFailed(true)}
         />
-      ) : source ? (
+      ) : source && !(globalReduceMotion && animatedImage) ? (
         <img
           src={source}
           alt={accessibleName}
