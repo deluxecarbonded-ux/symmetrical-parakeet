@@ -317,9 +317,9 @@ export default {
     "Ich habe ein Gesicht, aber keine Augen, Hände, aber keine Arme, und eine Uhr, die nie tickt. Ich werde in einer Tasche getragen und kann die Zeit angeben. Was bin ich?",
   "puzzle.wordPrompt.18":
     "Ich habe Flügel, kann aber nicht fliegen, Augen, kann aber nicht sehen und eine Nadel, aber keinen Faden. Ich sitze neben deinem Bett und zähle die Stunden. Was bin ich?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Ich bin ein Zuhause für Schlüssel, habe eine Wirbelsäule, aber keine Knochen, und werde durch eine geheime Formel geöffnet. Wie heiße ich?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "Ich habe eine Wirbelsäule, einen Einband und Tausende von Geschichten. Ich kann geöffnet, geschlossen und gelesen werden, bewege mich aber nie. Was bin ich?",
   "puzzle.answer.key": "Schlüssel",
   "puzzle.answer.pencil": "Bleistift",

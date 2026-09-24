@@ -316,9 +316,9 @@ export default {
     "Ik heb een gezicht maar geen ogen, uurwijzers maar geen armen en een klok die nooit tikt. Ik word in een zak gedragen en kan de tijd aangeven. Wat ben ik?",
   "puzzle.wordPrompt.18":
     "Ik heb vleugels maar kan niet vliegen, ogen maar kan niet zien en een naald maar geen draad. Ik sta naast je bed en tel de uren. Wat ben ik?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Ik ben een huis voor sleutels, heb een ruggengraat maar geen botten en word met een geheime zin geopend. Hoe heet ik?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "Ik heb een ruggengraat, een omslag en duizenden verhalen. Ik kan worden geopend, gesloten en gelezen, maar beweeg nooit. Wat ben ik?",
   "puzzle.answer.key": "sleutel",
   "puzzle.answer.pencil": "potlood",

@@ -311,9 +311,9 @@ export default {
     "Yüzüm var ama gözüm yok, ellerim var ama kollarım yok ve hiç tik demeyen bir saatim var. Cebimde taşınırım ve zamanı gösterebilirim. Ne olduğum?",
   "puzzle.wordPrompt.18":
     "Kanatlarım var ama uçamam, gözlerim var ama göremem, iğnem var ama ipliğim yok. Yatağının yanında durur ve saatleri sayarım. Ne olduğum?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Anahtarlar için bir evim, kemikleri olmayan bir sırtım var ve gizli bir ifadeyle açılırım. Adım ne?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "Sırtım, bir kapak ve binlerce hikâyem var. Açılabilir, kapatılabilir ve okunabilirim ama asla hareket etmem. Ne olduğum?",
   "puzzle.answer.key": "anahtar",
   "puzzle.answer.pencil": "kalem",

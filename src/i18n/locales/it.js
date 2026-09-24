@@ -320,9 +320,9 @@ export default {
     "Ho un quadrante ma nessun occhio, delle lancette ma nessun braccio e un orologio che non ticchetta. Vengo portato in tasca e posso indicare l'ora. Che cosa sono?",
   "puzzle.wordPrompt.18":
     "Ho ali ma non volo, occhi ma non vedo e un ago ma nessun filo. Sto accanto al tuo letto e conto le ore. Che cosa sono?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Sono una casa per le chiavi, ho una spina dorsale ma nessun osso e vengo aperto da una frase segreta. Qual è il mio nome?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "Ho una spina dorsale, una copertina e migliaia di storie. Posso essere aperto, chiuso e letto, ma non mi muovo mai. Che cosa sono?",
   "puzzle.answer.key": "chiave",
   "puzzle.answer.pencil": "matita",

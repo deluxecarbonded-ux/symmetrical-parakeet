@@ -313,9 +313,9 @@ export default {
     "顔はあるが目はなく、手はあるが腕はなく、時計は一度も時を刻まない。ポケットに運ばれ、時間を示せる。私は何ですか？",
   "puzzle.wordPrompt.18":
     "翼はあるが飛べない、目はあるが見えない、針はあるが糸がない。ベッドの横で時を数える。私は何ですか？",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "私は鍵のための家だ。背骨はあるが骨はなく、秘密のフレーズで開く。私の名前は何ですか？",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "背骨、表紙、数千の物語がある。開く、閉じる、読むことはできるが決して動かない。私は何ですか？",
   "puzzle.answer.key": "かぎ",
   "puzzle.answer.pencil": "えんぴつ",

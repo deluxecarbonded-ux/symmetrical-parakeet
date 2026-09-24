@@ -318,9 +318,9 @@ export default {
     "J'ai un visage mais pas d'yeux, des mains mais pas de bras, et une horloge qui ne ticte jamais. On me porte dans une poche et je peux donner l'heure. Qu'est-ce que je suis ?",
   "puzzle.wordPrompt.18":
     "J'ai des ailes mais je ne peux pas voler, des yeux mais je ne peux pas voir et une aiguille mais pas de fil. Je me tiens près de ton lit et compte les heures. Qu'est-ce que je suis ?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Je suis une maison pour des clés, j'ai une colonne vertébrale mais pas d'os, et je suis ouvert par une phrase secrète. Quel est mon nom ?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "J'ai une colonne vertébrale, une couverture et des milliers d'histoires. Je peux être ouvert, fermé et lu, mais je ne bouge jamais. Qu'est-ce que je suis ?",
   "puzzle.answer.key": "clé",
   "puzzle.answer.pencil": "crayon",

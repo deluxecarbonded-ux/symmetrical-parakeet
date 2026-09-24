@@ -370,9 +370,9 @@ export default {
     "我有脸却没有眼睛，有手却没有手臂，还有一只永不滴答作响的钟。我被装在口袋里随身携带，还能告诉人们时间。我是什么？",
   "puzzle.wordPrompt.18":
     "我有翅膀却不会飞，有眼睛却看不见，有指针却没有线。我放在床边，为你数着时间。我是什么？",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "我是钥匙的家，有脊背却没有骨头，还要用一句秘密口令打开。我叫什么名字？",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "我有书脊、封面和成千上万个故事。我可以被打开、关闭和阅读，却从不移动。我是什么？",
   "puzzle.answer.key": "钥匙",
   "puzzle.answer.pencil": "铅笔",

@@ -40,8 +40,15 @@ with templates(prompt) as (
     (10, 'letters'::text, 'puzzle.answer.cheetah'::text, 'cheetah'::text, 'The vault is themed around speed. Think of the fastest land animal. What is its name?'::text),
     (13, 'letters'::text, 'puzzle.answer.watch'::text, 'watch'::text, 'I have a face but no eyes, hands but no arms, and a clock that never ticks. I am carried in a pocket and can tell time. What am I?'::text),
     (18, 'letters'::text, 'puzzle.answer.clock'::text, 'clock'::text, 'I have wings but cannot fly, eyes but cannot see, and a needle but no thread. I sit beside your bed and count the hours. What am I?'::text),
-    (24, 'letters'::text, 'puzzle.answer.keyring'::text, 'keyring'::text, 'I am a home for keys, I have a spine but no bones, and I am opened by a secret phrase. What is my name?'::text),
-    (27, 'letters'::text, 'puzzle.answer.book'::text, 'book'::text, 'I have a spine, a cover, and thousands of stories. I can be opened, closed, and read, but I never move. What am I?'::text)
+    (23, 'letters'::text, 'puzzle.answer.keyring'::text, 'keyring'::text, 'I am a home for keys, I have a spine but no bones, and I am opened by a secret phrase. What is my name?'::text),
+    (28, 'letters'::text, 'puzzle.answer.book'::text, 'book'::text, 'I have a spine, a cover, and thousands of stories. I can be opened, closed, and read, but I never move. What am I?'::text)
+), digit_answers(level, answer_code) as (
+  values
+    (1, '1247'), (2, '1214'), (4, '1673'), (5, '6447'), (6, '3452'),
+    (7, '2244'), (9, '8135'), (11, '2866'), (12, '1551'), (14, '8813'),
+    (15, '5563'), (16, '2464'), (17, '1234'), (19, '1234'), (20, '6244'),
+    (21, '6422'), (22, '3813'), (24, '6134'), (25, '4554'), (26, '5466'),
+    (27, '8558'), (29, '3154'), (30, '7584')
 ), generated as (
   select
     d.difficulty,
@@ -50,12 +57,12 @@ with templates(prompt) as (
     coalesce(w.prompt, e.prompt) as prompt,
     coalesce(w.answer_type, 'digits'::text) as answer_type,
     w.answer_key,
-    w.answer_code,
-    case d.difficulty when 'easy' then 40 when 'medium' then 55 else 70 end + e.level as points,
-    case d.difficulty when 'easy' then 113 when 'medium' then 509 else 947 end as difficulty_offset
+    coalesce(w.answer_code, da.answer_code) as answer_code,
+    case d.difficulty when 'easy' then 40 when 'medium' then 55 else 70 end + e.level as points
   from expanded e
   cross join (values ('easy'::public.difficulty), ('medium'::public.difficulty), ('hard'::public.difficulty)) as d(difficulty)
   left join word_answers w on w.level = e.level
+  left join digit_answers da on da.level = e.level
 )
 insert into public.content_puzzles(difficulty, level, category, prompt, clue_lines, answer_code, answer_type, answer_key, points)
 select
@@ -64,7 +71,7 @@ select
   category,
   prompt,
   jsonb_build_array('Use the first clue to establish parity.', 'Use the second clue to narrow the range.', 'Use the third clue to test the relationship.', 'Use the final clue to select the last digit.'),
-  coalesce(answer_code, lpad((((level * 317 + level * level * 29 + difficulty_offset) % 9000) + 1000)::text, 4, '0')),
+  answer_code,
   answer_type,
   answer_key,
   points

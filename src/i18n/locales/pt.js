@@ -315,9 +315,9 @@ export default {
     "Tenho rosto, mas não olhos; tenho mãos, mas não braços; e tenho um relógio que nunca marca o tempo. Sou carregado em um bolso e posso dizer as horas. O que sou?",
   "puzzle.wordPrompt.18":
     "Tenho asas, mas não posso voar; olhos, mas não posso ver; e uma agulha, mas nenhum fio. Fico ao lado da sua cama e conto as horas. O que sou?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Sou um lar para chaves, tenho uma coluna, mas não ossos, e sou aberto por uma frase secreta. Qual é o meu nome?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "Tenho uma coluna, uma capa e milhares de histórias. Posso ser aberto, fechado e lido, mas nunca me movo. O que sou?",
   "puzzle.answer.key": "chave",
   "puzzle.answer.pencil": "lápis",

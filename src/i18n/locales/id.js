@@ -394,9 +394,9 @@ export default {
     "Aku punya wajah tetapi tidak punya mata, tangan tetapi tidak punya lengan, serta jam yang tidak pernah berdetak. Aku dibawa dalam saku dan bisa menunjukkan waktu. Apa aku?",
   "puzzle.wordPrompt.18":
     "Aku punya sayap tetapi tidak bisa terbang, mata tetapi tidak bisa melihat, dan jarum tetapi tanpa benang. Aku duduk di samping tempat tidurmu dan menghitung jam. Apa aku?",
-  "puzzle.wordPrompt.24":
+  "puzzle.wordPrompt.23":
     "Aku adalah rumah bagi kunci, aku punya tulang belakang tetapi tidak punya tulang, dan aku dibuka dengan frasa rahasia. Apa namaku?",
-  "puzzle.wordPrompt.27":
+  "puzzle.wordPrompt.28":
     "Aku punya tulang belakang, sampul, dan ribuan cerita. Aku bisa dibuka, ditutup, dan dibaca, tetapi tidak pernah bergerak. Apa aku?",
   "puzzle.answer.key": "kunci",
   "puzzle.answer.pencil": "pensil",

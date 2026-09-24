@@ -194,18 +194,18 @@ export const WORD_PUZZLES = {
     promptKey: "puzzle.wordPrompt.18",
     answerKey: "puzzle.answer.clock",
   },
-  24: {
+  23: {
     answer: "keyring",
     prompt:
       "I am a home for keys, I have a spine but no bones, and I am opened by a secret phrase. What is my name?",
-    promptKey: "puzzle.wordPrompt.24",
+    promptKey: "puzzle.wordPrompt.23",
     answerKey: "puzzle.answer.keyring",
   },
-  27: {
+  28: {
     answer: "book",
     prompt:
       "I have a spine, a cover, and thousands of stories. I can be opened, closed, and read, but I never move. What am I?",
-    promptKey: "puzzle.wordPrompt.27",
+    promptKey: "puzzle.wordPrompt.28",
     answerKey: "puzzle.answer.book",
   },
 };
@@ -219,16 +219,39 @@ export const WORD_ANSWERS = Object.fromEntries(
 );
 
 const difficultyMeta = {
-  easy: { label: "Easy", offset: 113, rank: 1, accent: "lime" },
-  medium: { label: "Medium", offset: 509, rank: 2, accent: "violet" },
-  hard: { label: "Hard", offset: 947, rank: 3, accent: "coral" },
+  easy: { label: "Easy", rank: 1, accent: "lime" },
+  medium: { label: "Medium", rank: 2, accent: "violet" },
+  hard: { label: "Hard", rank: 3, accent: "coral" },
 };
 
-function codeFor(level, difficulty) {
-  const meta = difficultyMeta[difficulty];
-  const value = (level * 317 + level * level * 29 + meta.offset) % 9000;
-  return String(1000 + value);
-}
+// Canonical answer per level. The riddle text is identical across difficulties,
+// so a level's answer is the same on easy, medium, and hard (client and server
+// must agree). Word puzzles carry their own `answer` in WORD_PUZZLES.
+const DIGIT_ANSWERS = {
+  1: "1247",
+  2: "1214",
+  4: "1673",
+  5: "6447",
+  6: "3452",
+  7: "2244",
+  9: "8135",
+  11: "2866",
+  12: "1551",
+  14: "8813",
+  15: "5563",
+  16: "2464",
+  17: "1234",
+  19: "1234",
+  20: "6244",
+  21: "6422",
+  22: "3813",
+  24: "6134",
+  25: "4554",
+  26: "5466",
+  27: "8558",
+  29: "3154",
+  30: "7584",
+};
 
 function digitClueKeys(code) {
   const digits = code.split("").map(Number);
@@ -253,7 +276,7 @@ function makePuzzle(level, difficulty) {
   const meta = difficultyMeta[difficulty];
   const wordPuzzle = WORD_PUZZLES[level];
   const answerType = wordPuzzle ? "letters" : "digits";
-  const code = codeFor(level, difficulty);
+  const code = wordPuzzle ? null : (DIGIT_ANSWERS[level] || "0000");
   const answer = wordPuzzle?.answer || code;
   const clueKeys = answerType === "digits" ? digitClueKeys(code) : [];
   return {
