@@ -1,0 +1,13 @@
+project_id = "exotic"
+
+[auth]
+enable_anonymous_sign_ins = true
+
+[db.seed]
+sql_paths = ["./seed.sql", "./shop_seed.sql", "./translation_seed.sql", "./puzzle_answer_seed.sql"]
+
+[functions.ai-riddle]
+verify_jwt = true
+
+[functions.multiplayer-action]
+verify_jwt = true
