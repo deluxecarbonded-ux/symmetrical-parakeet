@@ -2,17 +2,17 @@ import { Delete, RotateCcw } from "lucide-react";
 import { formatCode, normalizeDigits } from "../lib/numerals";
 import { getLetterCharacters } from "../lib/letterSets";
 
-function appendDigit(value, digit, maxLength) {
-  return normalizeDigits(`${value}${digit}`).slice(0, maxLength);
+function appendDigit(value, digit, maxCharacters) {
+  return normalizeDigits(`${value}${digit}`).slice(0, maxCharacters);
 }
 
-function cleanWord(value, maxLength = 40) {
+function cleanWord(value, maxCharacters = 40) {
   return [...String(value)]
     .filter((character) => /[\p{L}\p{M}\s]/u.test(character))
     .join("")
     .replace(/\s+/g, " ")
     .trimStart()
-    .slice(0, maxLength);
+    .slice(0, maxCharacters);
 }
 
 export function Numpad({
@@ -24,14 +24,14 @@ export function Numpad({
   locale = "en",
   disabled = false,
   inputRef,
-  maxLength = 4,
+  maxCharacters = 4,
 }) {
   const focusInput = () => {
     window.setTimeout(() => inputRef?.current?.focus(), 0);
   };
   const updateDigit = (digit) => {
     if (disabled) return;
-    onChange(appendDigit(value, digit, maxLength));
+    onChange(appendDigit(value, digit, maxCharacters));
     focusInput();
   };
   const removeDigit = () => {
@@ -68,11 +68,10 @@ export function Numpad({
         aria-label={t("single.enterCode")}
         inputMode="numeric"
         autoComplete="one-time-code"
-        maxLength={maxLength}
         value={value}
         onChange={(event) => {
           if (!disabled)
-            onChange(normalizeDigits(event.target.value).slice(0, maxLength));
+            onChange(normalizeDigits(event.target.value).slice(0, maxCharacters));
         }}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
@@ -141,11 +140,11 @@ export function LettersPad({
   locale = "en",
   disabled = false,
   inputRef,
-  maxLength = 40,
+  maxCharacters = 40,
 }) {
   const characters = getLetterCharacters(locale);
   const rtl = locale === "ar" || locale === "ur";
-  const updateWord = (next) => onChange(cleanWord(next, maxLength));
+  const updateWord = (next) => onChange(cleanWord(next, maxCharacters));
   const appendCharacter = (character) => {
     if (disabled) return;
     updateWord(`${value}${character}`);
@@ -187,7 +186,6 @@ export function LettersPad({
         dir={rtl ? "rtl" : "ltr"}
         autoComplete="off"
         spellCheck={false}
-        maxLength={maxLength}
         value={value}
         placeholder={t("single.wordPlaceholder")}
         onChange={(event) => {

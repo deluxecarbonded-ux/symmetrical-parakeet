@@ -34,6 +34,38 @@ import {
 } from "../components/Primitives";
 import { formatDate, formatNumber } from "../lib/storage";
 import ProfileAvatar from "../components/ProfileMedia";
+import ValidationMessage from "../components/FormValidation";
+import { isValidUsername, normalizeUsername } from "../lib/identity";
+
+const MEDIA_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "avif",
+  "heic",
+  "heif",
+  "svg",
+  "mp4",
+  "m4v",
+  "mov",
+  "webm",
+  "ogv",
+  "3gp",
+  "3g2",
+  "mkv",
+]);
+
+function isSupportedMediaFile(file) {
+  const type = String(file?.type || "").toLowerCase();
+  if (type.startsWith("image/") || type.startsWith("video/")) return true;
+  const extension = String(file?.name || "")
+    .split(".")
+    .pop()
+    ?.toLowerCase();
+  return MEDIA_EXTENSIONS.has(extension);
+}
 
 export default function Profile({ mode = "single" }) {
   const {
@@ -48,15 +80,18 @@ export default function Profile({ mode = "single" }) {
   } = useApp();
   const navigate = useNavigate();
   const [name, setName] = useState(profile?.username || profile?.displayName || "");
+  const [usernameError, setUsernameError] = useState("");
+  const [mediaError, setMediaError] = useState("");
   const [editing, setEditing] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const mediaInputRef = useRef(null);
   const isSingle = mode === "single";
   const data = isSingle ? progress.single : progress.multi;
-  useEffect(
-    () => setName(profile?.username || profile?.displayName || ""),
-    [profile?.displayName, profile?.username],
-  );
+  useEffect(() => {
+    setName(profile?.username || profile?.displayName || "");
+    setUsernameError("");
+    setMediaError("");
+  }, [profile?.displayName, profile?.username]);
   const solved = data?.solved || 0;
   const score = data?.score || 0;
   const rounds = isSingle ? solved : data?.matches || 0;
@@ -65,9 +100,28 @@ export default function Profile({ mode = "single" }) {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
+    if (!isSupportedMediaFile(file) || file.size > 25 * 1024 * 1024) {
+      setMediaError("profile.mediaInvalid");
+      return;
+    }
+    setMediaError("");
     setUploadingMedia(true);
-    await uploadAvatar(file);
-    setUploadingMedia(false);
+    try {
+      const uploaded = await uploadAvatar(file);
+      if (!uploaded) setMediaError("profile.mediaUploadFailed");
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
+
+  const saveName = async () => {
+    const normalized = normalizeUsername(name);
+    if (!isValidUsername(normalized)) {
+      setUsernameError("validation.username");
+      return;
+    }
+    setUsernameError("");
+    if (await saveUsername(normalized)) setEditing(false);
   };
 
   return (
@@ -156,28 +210,41 @@ export default function Profile({ mode = "single" }) {
             {profile && (
               <button
                 className="icon-button profile-edit"
-                onClick={() => setEditing((value) => !value)}
+                onClick={() => {
+                  const nextEditing = !editing;
+                  setEditing(nextEditing);
+                  if (!nextEditing) setUsernameError("");
+                }}
                 aria-label={t("profile.editUsername")}
               >
                 <Edit3 size={17} />
               </button>
             )}
             {editing && (
-              <div className="profile-edit-form">
+              <div
+                className={`profile-edit-form ${
+                  usernameError ? "has-error" : ""
+                }`}
+              >
                 <input
                   value={name}
-                  onChange={(event) => setName(event.target.value)}
+                  onChange={(event) => {
+                    setName(event.target.value);
+                    setUsernameError("");
+                  }}
                   placeholder={t("profile.username")}
                   autoComplete="username"
                   dir="ltr"
+                  aria-invalid={Boolean(usernameError)}
+                  aria-describedby="profile-username-error"
                 />
-                <Button
-                  size="sm"
-                  onClick={async () => {
-                    if (await saveUsername(name)) setEditing(false);
-                  }}
-                  icon={Save}
+                <ValidationMessage
+                  id="profile-username-error"
+                  visible={Boolean(usernameError)}
                 >
+                  {usernameError ? t(usernameError) : null}
+                </ValidationMessage>
+                <Button size="sm" onClick={saveName} icon={Save}>
                   {t("common.save")}
                 </Button>
               </div>
@@ -205,7 +272,7 @@ export default function Profile({ mode = "single" }) {
                 ref={mediaInputRef}
                 className="visually-hidden-input"
                 type="file"
-                accept="image/*,video/*"
+                aria-describedby="profile-media-error"
                 onChange={handleMediaChange}
               />
               <Button
@@ -221,6 +288,12 @@ export default function Profile({ mode = "single" }) {
                     ? t("profile.mediaReplace")
                     : t("profile.mediaUpload")}
               </Button>
+              <ValidationMessage
+                id="profile-media-error"
+                visible={Boolean(mediaError)}
+              >
+                {mediaError ? t(mediaError) : null}
+              </ValidationMessage>
             </Card>
           )}
           <div className="profile-stat-grid">

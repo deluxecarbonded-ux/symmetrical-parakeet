@@ -15,6 +15,7 @@ import {
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../App";
 import { Button, Card, Pill } from "../components/Primitives";
+import ValidationMessage from "../components/FormValidation";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -60,12 +61,20 @@ export default function Auth({ scope = "single" }) {
     email: "idle",
     username: "idle",
   });
+  const [errors, setErrors] = useState({
+    email: "",
+    username: "",
+    password: "",
+  });
+  const fieldRefs = useRef({});
   const availabilityRequests = useRef({ email: 0, username: 0 });
   const next = params.get("next") || (scope === "multi" ? "/multi" : "/");
   const scopeLabel =
     scope === "multi" ? t("dashboard.multiMode") : t("dashboard.singleMode");
-  const update = (key) => (event) =>
+  const update = (key) => (event) => {
     setForm((current) => ({ ...current, [key]: event.target.value }));
+    setErrors((current) => ({ ...current, [key]: "" }));
+  };
   useEffect(() => {
     if (mode !== "signup") return undefined;
     const email = form.email.trim();
@@ -153,22 +162,52 @@ export default function Auth({ scope = "single" }) {
   const changeMode = (nextMode) => {
     setMode(nextMode);
     setAvailability({ email: "idle", username: "idle" });
+    setErrors({ email: "", username: "", password: "" });
+  };
+
+  const focusFirstError = (nextErrors) => {
+    const firstField = ["username", "email", "password"].find(
+      (field) => nextErrors[field],
+    );
+    if (!firstField) return;
+    window.requestAnimationFrame(() => fieldRefs.current[firstField]?.focus());
+  };
+
+  const validate = () => {
+    const nextErrors = { email: "", username: "", password: "" };
+    const email = form.email.trim();
+    const username = normalizeUsername(form.username);
+    const password = form.password;
+
+    if (!email) nextErrors.email = "validation.required";
+    else if (!EMAIL_PATTERN.test(email)) nextErrors.email = "validation.email";
+
+    if (mode === "signup") {
+      if (!username) nextErrors.username = "validation.required";
+      else if (!isValidUsername(username)) {
+        nextErrors.username = "validation.username";
+      }
+    }
+
+    if (!password) nextErrors.password = "validation.required";
+    else if (password.length < 6) nextErrors.password = "validation.password";
+
+    setErrors(nextErrors);
+    return nextErrors;
   };
 
   const submit = async (event) => {
     event.preventDefault();
+    const nextErrors = validate();
+    if (Object.values(nextErrors).some(Boolean)) {
+      showToast("validation.fixErrors");
+      focusFirstError(nextErrors);
+      return;
+    }
+
+    const username = normalizeUsername(form.username);
+    const email = form.email.trim().toLowerCase();
     if (mode === "signup") {
-      const username = normalizeUsername(form.username);
-      const email = form.email.trim().toLowerCase();
-      if (!EMAIL_PATTERN.test(email) || !isValidUsername(username)) {
-        setAvailability((current) => ({
-          ...current,
-          email: EMAIL_PATTERN.test(email) ? current.email : "invalid",
-          username: isValidUsername(username) ? current.username : "invalid",
-        }));
-        showToast("auth.signupValidation");
-        return;
-      }
       if (
         availability.email !== "available" ||
         availability.username !== "available"
@@ -182,6 +221,8 @@ export default function Auth({ scope = "single" }) {
           showToast("auth.emailTaken");
         } else if (availability.username === "taken") {
           showToast("auth.usernameTaken");
+        } else {
+          showToast("auth.validationUnavailable");
         }
         return;
       }
@@ -195,7 +236,7 @@ export default function Auth({ scope = "single" }) {
       return;
     }
     const result = await signIn({
-      email: form.email,
+      email,
       password: form.password,
     });
     if (result) navigate(next, { replace: true });
@@ -278,30 +319,40 @@ export default function Auth({ scope = "single" }) {
               {t("auth.signUp")}
             </button>
           </div>
-          <form onSubmit={submit}>
+          <form onSubmit={submit} noValidate>
             {mode === "signup" && (
               <label className="form-field">
                 <span>{t("auth.username")}</span>
-                <div className={`input-wrap ${availability.username}`}>
+                <div
+                  className={`input-wrap ${availability.username} ${
+                    errors.username ? "has-error" : ""
+                  }`}
+                >
                   <UserRound size={16} />
                   <input
-                    required
-                    minLength={3}
-                    maxLength={24}
+                    ref={(node) => {
+                      fieldRefs.current.username = node;
+                    }}
                     autoComplete="username"
                     dir="ltr"
+                    inputMode="text"
                     value={form.username}
                     onChange={update("username")}
                     placeholder={t("auth.usernamePlaceholder")}
-                    aria-invalid={
-                      availability.username === "invalid" ||
-                      availability.username === "taken"
-                    }
+                    aria-invalid={Boolean(
+                      errors.username ||
+                        availability.username === "invalid" ||
+                        availability.username === "taken",
+                    )}
+                    aria-describedby="auth-username-hint auth-username-status auth-username-error"
                   />
                 </div>
-                <small className="field-hint">{t("auth.usernameHint")}</small>
+                <small id="auth-username-hint" className="field-hint">
+                  {t("auth.usernameHint")}
+                </small>
                 {availability.username !== "idle" && (
                   <small
+                    id="auth-username-status"
                     className={`field-status ${availability.username}`}
                     role="status"
                   >
@@ -310,46 +361,74 @@ export default function Auth({ scope = "single" }) {
                     )}
                   </small>
                 )}
+                <ValidationMessage
+                  id="auth-username-error"
+                  visible={Boolean(errors.username)}
+                >
+                  {errors.username ? t(errors.username) : null}
+                </ValidationMessage>
               </label>
             )}
             <label className="form-field">
               <span>{t("auth.email")}</span>
-              <div className={`input-wrap ${availability.email}`}>
+              <div
+                className={`input-wrap ${availability.email} ${
+                  errors.email ? "has-error" : ""
+                }`}
+              >
                 <Mail size={16} />
                 <input
-                  required
-                  type="email"
+                  ref={(node) => {
+                    fieldRefs.current.email = node;
+                  }}
+                  type="text"
+                  inputMode="email"
                   autoComplete="email"
                   dir="ltr"
                   value={form.email}
                   onChange={update("email")}
                   placeholder={t("auth.emailPlaceholder")}
-                  aria-invalid={
-                    availability.email === "invalid" ||
-                    availability.email === "taken"
-                  }
+                  aria-invalid={Boolean(
+                    errors.email ||
+                      availability.email === "invalid" ||
+                      availability.email === "taken",
+                  )}
+                  aria-describedby="auth-email-status auth-email-error"
                 />
               </div>
               {availability.email !== "idle" && (
                 <small
+                  id="auth-email-status"
                   className={`field-status ${availability.email}`}
                   role="status"
                 >
                   {t(availabilityMessageKey("email", availability.email))}
                 </small>
               )}
+              <ValidationMessage
+                id="auth-email-error"
+                visible={Boolean(errors.email)}
+              >
+                {errors.email ? t(errors.email) : null}
+              </ValidationMessage>
             </label>
             <label className="form-field">
               <span>{t("auth.password")}</span>
-              <div className="input-wrap">
+              <div
+                className={`input-wrap ${errors.password ? "has-error" : ""}`}
+              >
                 <LockKeyhole size={16} />
                 <input
-                  required
-                  minLength={6}
+                  ref={(node) => {
+                    fieldRefs.current.password = node;
+                  }}
                   type={showPassword ? "text" : "password"}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   value={form.password}
                   onChange={update("password")}
                   placeholder={t("auth.passwordPlaceholder")}
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby="auth-password-error"
                 />
                 <button
                   type="button"
@@ -364,6 +443,12 @@ export default function Auth({ scope = "single" }) {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              <ValidationMessage
+                id="auth-password-error"
+                visible={Boolean(errors.password)}
+              >
+                {errors.password ? t(errors.password) : null}
+              </ValidationMessage>
             </label>
             <Button
               className="full-button auth-submit"

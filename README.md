@@ -103,6 +103,10 @@ The App provider keeps one authenticated channel alive while the user is signed 
 
 `src/components/NotificationToaster.jsx` provides a custom shadcn-style notification stack for the entire app, including authentication screens. Notifications use translated titles and messages, semantic live-region announcements, tone-specific icons, hover/focus pause, progress bars, close and clear-all actions, responsive/RTL positioning, and reduced-motion-aware enter/exit animations. Existing `showToast(...)` calls are automatically routed through the new queue; new code can use `notify(...)` with an optional tone and duration.
 
+## Custom validation
+
+Native browser constraint validation is disabled for the app form. `src/components/FormValidation.jsx` renders translated, animated inline validation states, while `src/pages/Auth.jsx` and `src/pages/Profile.jsx` perform their own field checks. Answer inputs now use controlled character sanitization instead of native length constraints.
+
 ## Data model
 
 `supabase/migrations/001_exotic.sql` through `004_match_stats.sql` define the core schema, room lifecycle, rewards, and match statistics. `005_localized_answers.sql` adds word-answer support, `006_supabase_first_state.sql` adds preferences and app-state hydration, `007_server_authority_and_rls.sql` locks private tables behind server-side RPCs, validates solo answers, and publishes only safe realtime state, `008_room_code_compatibility.sql` provides portable room-code generation, `009_signup_identity_validation.sql` adds normalized usernames and signup availability checks, and `010`–`017` add achievements, leaderboard/media persistence, realtime publication, revision signals, and safe room projections.

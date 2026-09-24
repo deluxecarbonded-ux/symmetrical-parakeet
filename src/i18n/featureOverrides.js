@@ -1,4 +1,5 @@
 import { notificationOverrides } from "./notificationOverrides.js";
+import { validationOverrides } from "./validationOverrides.js";
 
 const titles = {
   en: {
@@ -414,6 +415,7 @@ export const featureOverrides = Object.fromEntries(
       ...metricLabels[locale],
       ...titles[locale],
       ...notificationOverrides[locale],
+      ...validationOverrides[locale],
     },
   ]),
 );
