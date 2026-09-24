@@ -9,6 +9,7 @@ Exotic is a responsive code-and-word brain-teaser game built with React, Vite, L
 - First-to-crack and 60-second time-attack multiplayer modes
 - Host-selected rounds and categories; random category rotation for time attack
 - Realtime room updates through Supabase Postgres Changes
+- Realtime publication enabled for every application-owned table in the `public` schema, with RLS still controlling client visibility
 - Supabase-authoritative profiles, progress, wallets, inventories, activity, rooms, and purchases
 - No browser localStorage, sessionStorage, BroadcastChannel rooms, or fake local accounts
 - Separate single-player and multiplayer wallets, inventories, shops, profiles, and routes
