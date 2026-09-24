@@ -19,7 +19,6 @@ import {
   Target,
   Trophy,
   UsersRound,
-  Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../App";
@@ -36,16 +35,8 @@ import {
 import { formatDate, formatNumber, getInitials } from "../lib/storage";
 
 export default function Profile({ mode = "single" }) {
-  const {
-    t,
-    profile,
-    progress,
-    wallet,
-    settings,
-    saveDisplayName,
-    signOut,
-    supabaseConfigured,
-  } = useApp();
+  const { t, profile, progress, wallet, settings, saveDisplayName, signOut } =
+    useApp();
   const navigate = useNavigate();
   const [name, setName] = useState(profile?.displayName || "");
   const [editing, setEditing] = useState(false);
@@ -119,11 +110,6 @@ export default function Profile({ mode = "single" }) {
                       : t("profile.connected")
                     : t("dashboard.guest")}
                 </Pill>
-                {supabaseConfigured && (
-                  <Pill tone="violet" icon={Zap}>
-                    {t("profile.synced")}
-                  </Pill>
-                )}
               </div>
             </div>
             <button

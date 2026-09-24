@@ -66,6 +66,13 @@ const incompleteLocales = Object.entries(localeCoverage)
   .map(([locale, count]) => `${locale} (${count}/${expectedLocaleKeys})`);
 
 const missing = [...usedKeys].filter((key) => !knownKeys.has(key));
+const forbiddenUiCopy = /supabase|realtime|openrouter|open router|database/i;
+const technologyCopyLeaks = Object.entries(translations).flatMap(
+  ([locale, dictionary]) =>
+    Object.entries(dictionary)
+      .filter(([, value]) => forbiddenUiCopy.test(String(value)))
+      .map(([key]) => `${locale}.${key}`),
+);
 const localeCount = Object.keys(translations).length;
 console.log(
   `Checked ${localeCount} locales, ${knownKeys.size} keys, and ${usedKeys.size} static UI references.`,
@@ -82,5 +89,11 @@ if (placeholderMismatches.length) {
 }
 if (missing.length) {
   console.error(`Missing translation keys: ${missing.join(", ")}`);
+  process.exit(1);
+}
+if (technologyCopyLeaks.length) {
+  console.error(
+    `Technology references found in UI copy: ${technologyCopyLeaks.join(", ")}`,
+  );
   process.exit(1);
 }

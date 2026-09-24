@@ -12,28 +12,20 @@ import {
   Sun,
   Volume2,
   VolumeX,
-  Zap,
 } from "lucide-react";
 import { useApp } from "../App";
 import {
   Card,
   PageHeader,
-  Pill,
   SectionHeading,
   Button,
 } from "../components/Primitives";
 import { LANGUAGES } from "../i18n/translations";
 import { formatDigitSequence, getNumberingSystem } from "../lib/numerals";
+import SelectMenu from "../components/SelectMenu";
 
 export default function Settings() {
-  const {
-    t,
-    settings,
-    updateSettings,
-    resetProgress,
-    supabaseConfigured,
-    showToast,
-  } = useApp();
+  const { t, settings, updateSettings, resetProgress, showToast } = useApp();
   const [confirmReset, setConfirmReset] = useState(false);
   return (
     <main className="page settings-page">
@@ -41,13 +33,6 @@ export default function Settings() {
         eyebrow={t("nav.settings")}
         title={t("settings.title")}
         description={t("settings.subtitle")}
-        actions={
-          <Pill tone={supabaseConfigured ? "lime" : "neutral"} icon={Zap}>
-            {supabaseConfigured
-              ? t("multi.online")
-              : t("toast.syncUnavailable")}
-          </Pill>
-        }
       />
       <div className="settings-layout">
         <div className="settings-main">
@@ -104,18 +89,15 @@ export default function Settings() {
               </div>
               <div className="language-select">
                 <Globe2 size={15} />
-                <select
+                <SelectMenu
                   value={settings.locale}
-                  onChange={(event) =>
-                    updateSettings({ locale: event.target.value })
-                  }
-                >
-                  {LANGUAGES.map(([code, label]) => (
-                    <option value={code} key={code}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
+                  options={LANGUAGES.map(([code, label]) => ({
+                    value: code,
+                    label,
+                  }))}
+                  onChange={(value) => updateSettings({ locale: value })}
+                  ariaLabel={t("language")}
+                />
               </div>
             </div>
             <div className="language-rtl-note">
@@ -169,7 +151,7 @@ export default function Settings() {
                 {t("settings.languageCount", { count: 16 })}
               </span>
               <span>
-                <Zap size={14} /> {t("settings.realtimeReady")}
+                <Check size={14} /> {t("multi.ready")}
               </span>
             </div>
           </Card>

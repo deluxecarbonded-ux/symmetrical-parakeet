@@ -176,8 +176,8 @@ const english = {
     "Most codes cracked wins. Categories rotate automatically.",
   "multi.firstToCrackDesc":
     "The first player to submit the right code takes the round.",
-  "multi.online": "Realtime room",
-  "multi.localRoom": "Open a second tab to test local rooms",
+  "multi.online": "Online room",
+  "multi.localRoom": "Open a second tab to test multiplayer",
   "multi.ready": "Ready",
   "multi.notReady": "Not ready",
   "multi.matchStarted": "Match started",
@@ -285,7 +285,7 @@ const english = {
   "toast.codeCopied": "Code copied",
   "toast.needSignIn": "Create a profile to save this result.",
   "toast.aiUnavailable": "AI is taking a breather. Showing a local hint.",
-  "toast.syncUnavailable": "Saved on this device. Cloud sync will retry later.",
+  "toast.syncUnavailable": "Connection unavailable. Please try again.",
   "toast.joined": "Room joined",
   "toast.roomLeft": "You left the room",
   "toast.purchased": "Item added to your inventory",
@@ -297,7 +297,7 @@ const english = {
   "app.editionMarker": "EXOTIC / 01",
   "app.footer": "EXOTIC / 2026",
   "meta.title": "Exotic — Crack the code",
-  "meta.description": "Exotic — a realtime four-digit code brain teaser.",
+  "meta.description": "Exotic — a four-digit code brain teaser.",
   "nav.openNavigation": "Open navigation",
   "profile.defaultGuestName": "Guest",
   "profile.defaultPlayerName": "Player",
@@ -310,7 +310,7 @@ const english = {
   "settings.soundDescription": "Subtle feedback for solved codes.",
   "settings.reduceMotionDescription": "Keep transitions calm and quick.",
   "settings.languageCount": "{count} languages",
-  "settings.realtimeReady": "Realtime ready",
+  "settings.realtimeReady": "Ready to play",
   "shop.filter.all": "All",
   "shop.filter.utility": "Utility",
   "shop.filter.visual": "Visual",
@@ -352,8 +352,7 @@ const english = {
   "shop.unit.multi": "duel coins",
   "shop.coinsNeeded": "{amount} {unit} needed",
   "error.title": "Exotic needs a reset.",
-  "error.description":
-    "Reload the room or clear this device's local session to continue.",
+  "error.description": "Reload Exotic and try again.",
   "error.reload": "Reload Exotic",
 };
 
@@ -1018,6 +1017,90 @@ export const translations = Object.fromEntries(
     },
   ]),
 );
+
+const publicCopyOverrides = {
+  en: {
+    "meta.description": "Exotic — a four-digit code brain teaser.",
+    "toast.syncUnavailable": "Connection unavailable. Please try again.",
+  },
+  ar: {
+    "meta.description": "Exotic — لعبة ألغاز لكسر الشيفرات الرباعية.",
+    "toast.syncUnavailable": "الاتصال غير متاح. حاول مرة أخرى.",
+  },
+  fr: {
+    "meta.description":
+      "Exotic — un jeu de réflexion pour casser des codes à quatre chiffres.",
+    "toast.syncUnavailable": "Connexion indisponible. Veuillez réessayer.",
+  },
+  es: {
+    "meta.description":
+      "Exotic — un juego de lógica para romper códigos de cuatro dígitos.",
+    "toast.syncUnavailable": "Conexión no disponible. Inténtalo de nuevo.",
+  },
+  de: {
+    "meta.description": "Exotic — ein Ratespiel für vierstellige Codes.",
+    "toast.syncUnavailable":
+      "Verbindung nicht verfügbar. Bitte erneut versuchen.",
+  },
+  pt: {
+    "meta.description":
+      "Exotic — um jogo de lógica para quebrar códigos de quatro dígitos.",
+    "toast.syncUnavailable": "Conexão indisponível. Tente novamente.",
+  },
+  it: {
+    "meta.description": "Exotic — un enigma logico con codici a quattro cifre.",
+    "toast.syncUnavailable": "Connessione non disponibile. Riprova.",
+  },
+  nl: {
+    "meta.description": "Exotic — een denkspel voor viercijferige codes.",
+    "toast.syncUnavailable":
+      "Verbinding niet beschikbaar. Probeer het opnieuw.",
+  },
+  ru: {
+    "meta.description": "Exotic — логическая игра с кодами из четырёх цифр.",
+    "toast.syncUnavailable": "Соединение недоступно. Попробуйте ещё раз.",
+  },
+  tr: {
+    "meta.description": "Exotic — dört haneli kodlar için bir bulmaca oyunu.",
+    "toast.syncUnavailable": "Bağlantı kullanılamıyor. Tekrar deneyin.",
+  },
+  ja: {
+    "meta.description": "Exotic — 4桁のコードを解けるパズル。",
+    "toast.syncUnavailable": "接続できません。もう一度お試しください。",
+  },
+  ko: {
+    "meta.description": "Exotic — 네 자리 코드를 푸는 퍼즐 게임.",
+    "toast.syncUnavailable": "연결할 수 없습니다. 다시 시도해 주세요.",
+  },
+  zh: {
+    "meta.description": "Exotic — 四位数代码解谜游戏。",
+    "toast.syncUnavailable": "连接不可用，请重试。",
+  },
+  hi: {
+    "meta.description": "Exotic — चार अंकों के कोड के लिए पहेली गेम।",
+    "toast.syncUnavailable": "कनेक्शन उपलब्ध नहीं है। फिर कोशिश करें।",
+  },
+  id: {
+    "meta.description": "Exotic — permainan teka-teki untuk kode empat angka.",
+    "toast.syncUnavailable": "Koneksi tidak tersedia. Coba lagi.",
+  },
+  ur: {
+    "meta.description": "Exotic — چار ہندسوں کے کوڈ کے لیے پزل گیم۔",
+    "toast.syncUnavailable": "کنکشن دستیاب نہیں۔ دوبارہ کوشش کریں۔",
+  },
+};
+
+for (const [locale, copy] of Object.entries(publicCopyOverrides)) {
+  Object.assign(translations[locale], copy);
+  translations[locale]["multi.online"] =
+    translations[locale]["multi.roomLive"] ||
+    translations[locale]["multi.ready"];
+  translations[locale]["multi.localRoom"] =
+    translations[locale]["multi.shareRoom"] ||
+    translations[locale]["multi.ready"];
+  translations[locale]["settings.realtimeReady"] =
+    translations[locale]["multi.ready"] || "Ready";
+}
 
 export function translate(locale, key, values = {}) {
   let text = translations[locale]?.[key] ?? translations.en[key] ?? key;

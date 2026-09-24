@@ -74,15 +74,7 @@ function HeroVisual() {
 }
 
 export default function Dashboard() {
-  const {
-    t,
-    profile,
-    progress,
-    wallet,
-    activity,
-    settings,
-    supabaseConfigured,
-  } = useApp();
+  const { t, profile, progress, wallet, activity, settings } = useApp();
   const single = progress.single || {};
   const multi = progress.multi || {};
   const totalSolved = (single.solved || 0) + (multi.solved || 0);
@@ -131,12 +123,6 @@ export default function Dashboard() {
             </LinkButton>
           </div>
           <div className="hero-meta">
-            <span>
-              <span className="status-dot online" />{" "}
-              {supabaseConfigured
-                ? t("multi.online")
-                : t("toast.syncUnavailable")}
-            </span>
             <span>
               <LockKeyhole size={13} /> {t("auth.secureNote")}
             </span>
@@ -226,7 +212,7 @@ export default function Dashboard() {
               <h3>{t("dashboard.multiMode")}</h3>
               <p>{t("dashboard.multiDesc")}</p>
               <div className="mode-card-bottom">
-                <span>{t("multi.online")}</span>
+                <span>{t("multi.roomLive")}</span>
                 <span className="round-arrow">
                   <ArrowRight size={16} />
                 </span>

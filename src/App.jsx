@@ -841,7 +841,6 @@ export default function App() {
       getAiHint,
       playCue,
       multiplayer,
-      supabaseConfigured: isSupabaseConfigured,
     }),
     [
       activity,

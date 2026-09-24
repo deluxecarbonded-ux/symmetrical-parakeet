@@ -3,17 +3,14 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  ChevronDown,
   Clock3,
   Copy,
   Crown,
   Gamepad2,
-  Globe2,
   Hash,
   Info,
   LockKeyhole,
   Plus,
-  Radio,
   RefreshCw,
   Send,
   Settings2,
@@ -42,6 +39,7 @@ import {
   WordSlots,
 } from "../components/Primitives";
 import { LettersPad, Numpad } from "../components/AnswerPad";
+import SelectMenu from "../components/SelectMenu";
 import { CATEGORY_LIST } from "../data/puzzles";
 import {
   formatCode,
@@ -101,7 +99,7 @@ function Lobby({
   isCreating,
   joinPending,
 }) {
-  const { t, settings: appSettings, profile, supabaseConfigured } = useApp();
+  const { t, settings: appSettings, profile } = useApp();
   const locale = appSettings.locale || "en";
   const navigate = useNavigate();
   const isHost = room?.hostId === currentPlayer?.id;
@@ -119,11 +117,8 @@ function Lobby({
       <div className="multi-lobby-main">
         <Card className="lobby-hero-card">
           <div className="lobby-hero-copy">
-            <Pill tone="accent" icon={Radio}>
-              <i className="live-dot" />{" "}
-              {supabaseConfigured
-                ? t("multi.online")
-                : t("toast.syncUnavailable")}
+            <Pill tone="accent" icon={Sparkles}>
+              <i className="live-dot" /> {t("multi.roomLive")}
             </Pill>
             <h2>{room ? t("multi.roomCreated") : t("multi.title")}</h2>
             <p>{room ? t("multi.shareRoom") : t("multi.subtitle")}</p>
@@ -139,7 +134,7 @@ function Lobby({
                   <span />
                   <span />
                 </div>
-                <span>{t("toast.syncUnavailable")}</span>
+                <span>{t("multi.ready")}</span>
               </div>
             )}
           </div>
@@ -229,29 +224,27 @@ function Lobby({
                   <Sparkles size={16} />
                   <span>{t("multi.categoryLabel")}</span>
                 </div>
-                <div className="category-select-wrap">
-                  <select
-                    disabled={settings.mode === "timeAttack"}
-                    value={
-                      settings.mode === "timeAttack" ? "All" : settings.category
-                    }
-                    onChange={(event) =>
-                      setSettings((current) => ({
-                        ...current,
-                        category: event.target.value,
-                      }))
-                    }
-                  >
-                    {CATEGORY_LIST.map((category) => (
-                      <option value={category} key={category}>
-                        {category === "All" || category === "random"
-                          ? t("multi.randomCategory")
-                          : t(`category.${category.toLowerCase()}`)}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown size={15} />
-                </div>
+                <SelectMenu
+                  className="category-select-menu"
+                  disabled={settings.mode === "timeAttack"}
+                  value={
+                    settings.mode === "timeAttack" ? "All" : settings.category
+                  }
+                  options={CATEGORY_LIST.map((category) => ({
+                    value: category,
+                    label:
+                      category === "All" || category === "random"
+                        ? t("multi.randomCategory")
+                        : t(`category.${category.toLowerCase()}`),
+                  }))}
+                  onChange={(value) =>
+                    setSettings((current) => ({
+                      ...current,
+                      category: value,
+                    }))
+                  }
+                  ariaLabel={t("multi.categoryLabel")}
+                />
               </div>
               <div className="name-field">
                 <label htmlFor="host-name">{t("profile.displayName")}</label>
@@ -411,7 +404,7 @@ function Lobby({
                 <UserPlus size={19} />
               </div>
               <strong>{t("multi.waiting")}</strong>
-              <p>{t("toast.syncUnavailable")}</p>
+              <p>{t("multi.waiting")}</p>
             </div>
           )}
         </Card>
@@ -470,7 +463,7 @@ function RoomLobby({ room, currentPlayer, isHost, canStart, host, shareUrl }) {
           <strong>
             {currentPlayer?.ready ? t("multi.ready") : t("multi.notReady")}
           </strong>
-          <p>{t("toast.syncUnavailable")}</p>
+          <p>{t("multi.waiting")}</p>
         </div>
         {!isHost && (
           <Button
@@ -817,7 +810,7 @@ function MatchFinished({ room, currentPlayer, onLeave }) {
 }
 
 export default function Multiplayer() {
-  const { t, profile, multiplayer, supabaseConfigured } = useApp();
+  const { t, profile, multiplayer } = useApp();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [settings, setSettings] = useState({
@@ -893,11 +886,6 @@ export default function Multiplayer() {
         title={t("multi.subtitle")}
         actions={
           <div className="header-action-cluster">
-            <Pill tone={supabaseConfigured ? "lime" : "neutral"} icon={Globe2}>
-              {supabaseConfigured
-                ? t("multi.online")
-                : t("toast.syncUnavailable")}
-            </Pill>
             <LinkButton
               to="/multi/shop"
               variant="quiet"

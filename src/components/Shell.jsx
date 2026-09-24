@@ -21,6 +21,7 @@ import {
 import { useApp } from "../App";
 import { LANGUAGES } from "../i18n/translations";
 import { getInitials } from "../lib/storage";
+import SelectMenu from "./SelectMenu";
 
 const primaryNav = [
   { to: "/", key: "nav.dashboard", icon: LayoutDashboard, end: true },
@@ -33,6 +34,8 @@ const libraryNav = [
   { to: "/single/profile", key: "nav.profile", icon: CircleUserRound },
   { to: "/settings", key: "nav.settings", icon: Settings2 },
 ];
+
+const allNavItems = [...primaryNav, ...libraryNav];
 
 function Brand({ compact = false }) {
   const navigate = useNavigate();
@@ -70,7 +73,7 @@ function NavItem({ item, onNavigate }) {
 }
 
 function Sidebar({ onNavigate }) {
-  const { t, profile, signOut, supabaseConfigured } = useApp();
+  const { t, profile, signOut } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const authPath = location.pathname.startsWith("/multi")
@@ -107,16 +110,6 @@ function Sidebar({ onNavigate }) {
         </div>
       </div>
       <div className="sidebar-bottom">
-        <div className="connection-line">
-          <span
-            className={`status-dot ${supabaseConfigured ? "online" : ""}`}
-          />
-          <span>
-            {supabaseConfigured
-              ? t("multi.online")
-              : t("toast.syncUnavailable")}
-          </span>
-        </div>
         <div className="sidebar-user">
           <div className="avatar avatar-small">
             {profile ? getInitials(profile.displayName) : "E"}
@@ -192,17 +185,16 @@ function Topbar({ onMenu }) {
       <div className="topbar-actions">
         <div className="language-control">
           <Globe2 size={16} />
-          <select
+          <SelectMenu
+            className="topbar-language-menu"
             value={settings.locale}
-            onChange={(event) => updateSettings({ locale: event.target.value })}
-            aria-label={t("language")}
-          >
-            {LANGUAGES.map(([code, label]) => (
-              <option key={code} value={code}>
-                {label}
-              </option>
-            ))}
-          </select>
+            options={LANGUAGES.map(([code, label]) => ({
+              value: code,
+              label,
+            }))}
+            onChange={(value) => updateSettings({ locale: value })}
+            ariaLabel={t("language")}
+          />
         </div>
         <button
           className="theme-toggle"
@@ -244,16 +236,9 @@ function Topbar({ onMenu }) {
 
 function MobileNav({ onNavigate }) {
   const { t } = useApp();
-  const items = [
-    { to: "/", key: "nav.dashboard", icon: LayoutDashboard, end: true },
-    { to: "/single", key: "nav.single", icon: Gamepad2 },
-    { to: "/multi", key: "nav.multi", icon: UsersRound },
-    { to: "/single/shop", key: "nav.shop", icon: ShoppingBag },
-    { to: "/single/profile", key: "nav.profile", icon: CircleUserRound },
-  ];
   return (
-    <nav className="mobile-nav">
-      {items.map((item) => {
+    <nav className="mobile-nav" aria-label={t("nav.openNavigation")}>
+      {allNavItems.map((item) => {
         const Icon = item.icon;
         return (
           <NavLink
