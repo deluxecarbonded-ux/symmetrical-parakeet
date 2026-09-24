@@ -491,6 +491,14 @@ select {
   box-shadow: var(--shadow-lg);
   scrollbar-width: thin;
   scrollbar-color: var(--muted-light) transparent;
+  transform-origin: top center;
+}
+.select-menu-content.is-open {
+  animation: selectMenuIn 0.18s ease both;
+}
+.select-menu-content.is-closed {
+  pointer-events: none;
+  animation: selectMenuOut 0.18s ease both;
 }
 .select-menu-option {
   display: flex;
@@ -4532,6 +4540,70 @@ select {
     transform: translateY(0);
   }
 }
+@keyframes selectMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes selectMenuOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+}
+@keyframes languageMenuDown {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes languageMenuUp {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.98);
+  }
+}
+@keyframes bottomNavOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(130%);
+    visibility: hidden;
+  }
+}
+@keyframes bottomNavIn {
+  from {
+    opacity: 0;
+    transform: translateY(130%);
+    visibility: visible;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -4622,11 +4694,7 @@ select {
     margin-left: 0;
   }
   .mobile-menu {
-    display: inline-flex;
-    margin-right: 13px;
-    background: var(--surface);
-    color: var(--ink);
-    box-shadow: var(--shadow-sm);
+    display: none;
   }
   .mobile-nav {
     position: fixed;
@@ -4635,9 +4703,12 @@ select {
     bottom: 12px;
     left: 14px;
     display: flex;
+    justify-content: center;
+    justify-content: safe center;
     gap: 4px;
     overflow-x: auto;
     overflow-y: hidden;
+    scroll-snap-type: x proximity;
     padding: 6px;
     border-radius: 17px;
     background: color-mix(in srgb, var(--surface) 94%, transparent);
@@ -4654,6 +4725,7 @@ select {
     justify-content: center;
     gap: 4px;
     min-height: 48px;
+    scroll-snap-align: center;
     border-radius: 12px;
     color: var(--muted);
     font-size: 8px;
@@ -4680,7 +4752,25 @@ select {
     margin-left: auto;
   }
   .language-control {
+    display: inline-flex;
+    width: 35px;
+    padding: 0;
+    justify-content: center;
+  }
+  .language-control .topbar-language-menu {
+    width: 35px;
+  }
+  .topbar-language-menu .select-menu-trigger {
+    padding: 0;
+    justify-content: center;
+  }
+  .topbar-language-menu .select-menu-value {
     display: none;
+  }
+  .topbar-language-menu .select-menu-content {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    min-width: 180px;
   }
   .dashboard-columns,
   .single-layout,
@@ -4717,6 +4807,31 @@ select {
   }
   .level-path {
     gap: 11px 5px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar-wrap,
+  .mobile-drawer-backdrop,
+  .drawer-close,
+  .mobile-menu {
+    display: none !important;
+  }
+  .main-shell.language-menu-open .topbar {
+    z-index: 30;
+  }
+  .main-shell.language-menu-open .mobile-nav {
+    pointer-events: none;
+    animation: bottomNavOut 0.2s ease both;
+  }
+  .main-shell.language-menu-closing .mobile-nav {
+    animation: bottomNavIn 0.24s ease both;
+  }
+  .topbar-language-menu .select-menu-content.is-open {
+    animation-name: languageMenuDown;
+  }
+  .topbar-language-menu .select-menu-content.is-closed {
+    animation-name: languageMenuUp;
   }
 }
 

@@ -1,19 +1,23 @@
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export default function SelectMenu({
   value,
   options,
   onChange,
+  onOpenChange,
   ariaLabel,
   placeholder = "Select",
   className = "",
   disabled = false,
 }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef(null);
   const optionRefs = useRef([]);
+  const closeTimer = useRef(null);
   const listboxId = useId();
   const selectedIndex = Math.max(
     0,
@@ -21,15 +25,54 @@ export default function SelectMenu({
   );
   const selected = options[selectedIndex];
 
+  const openMenu = useCallback(() => {
+    if (disabled) return;
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setMounted(true);
+    setClosing(false);
+    setOpen(true);
+    onOpenChange?.(true);
+  }, [disabled, onOpenChange]);
+
+  const closeMenu = useCallback(
+    (returnFocus = false) => {
+      if (!open && !mounted) return;
+      setOpen(false);
+      setClosing(true);
+      onOpenChange?.(false);
+      if (closeTimer.current) window.clearTimeout(closeTimer.current);
+      closeTimer.current = window.setTimeout(() => {
+        setMounted(false);
+        setClosing(false);
+        closeTimer.current = null;
+      }, 180);
+      if (returnFocus) {
+        window.requestAnimationFrame(() =>
+          rootRef.current?.querySelector("button")?.focus(),
+        );
+      }
+    },
+    [mounted, onOpenChange, open],
+  );
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) window.clearTimeout(closeTimer.current);
+    };
+  }, []);
+
   useEffect(() => {
     if (!open) return undefined;
     const closeOnOutsidePointer = (event) => {
-      if (!rootRef.current?.contains(event.target)) setOpen(false);
+      if (!rootRef.current?.contains(event.target)) closeMenu();
     };
     document.addEventListener("pointerdown", closeOnOutsidePointer);
     return () =>
       document.removeEventListener("pointerdown", closeOnOutsidePointer);
-  }, [open]);
+  }, [closeMenu, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -41,24 +84,20 @@ export default function SelectMenu({
 
   const choose = (option) => {
     onChange?.(option.value);
-    setOpen(false);
-    window.requestAnimationFrame(() =>
-      rootRef.current?.querySelector("button")?.focus(),
-    );
+    closeMenu(true);
   };
 
   const handleKeyDown = (event) => {
     if (disabled) return;
     if (event.key === "Escape") {
       event.preventDefault();
-      setOpen(false);
-      rootRef.current?.querySelector("button")?.focus();
+      closeMenu(true);
       return;
     }
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       if (!open) {
-        setOpen(true);
+        openMenu();
         return;
       }
       const direction = event.key === "ArrowDown" ? 1 : -1;
@@ -86,7 +125,9 @@ export default function SelectMenu({
   return (
     <div
       ref={rootRef}
-      className={`select-menu ${open ? "open" : ""} ${className}`}
+      className={`select-menu ${open ? "open" : ""} ${
+        closing ? "closing" : ""
+      } ${className}`}
       onKeyDown={handleKeyDown}
     >
       <button
@@ -97,17 +138,17 @@ export default function SelectMenu({
         aria-expanded={open}
         aria-controls={listboxId}
         disabled={disabled}
-        onClick={() => !disabled && setOpen((current) => !current)}
+        onClick={() => (open ? closeMenu() : openMenu())}
       >
         <span className="select-menu-value">
           {selected?.label || placeholder}
         </span>
         <ChevronDown size={15} aria-hidden="true" />
       </button>
-      {open && (
+      {mounted && (
         <div
           id={listboxId}
-          className="select-menu-content"
+          className={`select-menu-content ${open ? "is-open" : "is-closed"}`}
           role="listbox"
           aria-label={ariaLabel}
         >

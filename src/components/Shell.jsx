@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -8,14 +8,12 @@ import {
   LayoutDashboard,
   LogIn,
   LogOut,
-  Menu,
   Moon,
   Settings2,
   ShoppingBag,
   Sparkles,
   Sun,
   UsersRound,
-  X,
   Zap,
 } from "lucide-react";
 import { useApp } from "../App";
@@ -150,7 +148,7 @@ function Sidebar({ onNavigate }) {
   );
 }
 
-function Topbar({ onMenu }) {
+function Topbar({ onLanguageMenuChange }) {
   const { t, settings, updateSettings, profile } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
@@ -169,13 +167,6 @@ function Topbar({ onMenu }) {
               : t("nav.single");
   return (
     <header className="topbar">
-      <button
-        className="mobile-menu icon-button"
-        onClick={onMenu}
-        aria-label={t("nav.openNavigation")}
-      >
-        <Menu size={21} />
-      </button>
       <div className="topbar-context">
         <span className="context-kicker">
           {isMulti ? t("app.contextDuel") : t("app.contextSolo")}
@@ -193,6 +184,7 @@ function Topbar({ onMenu }) {
               label,
             }))}
             onChange={(value) => updateSettings({ locale: value })}
+            onOpenChange={onLanguageMenuChange}
             ariaLabel={t("language")}
           />
         </div>
@@ -260,30 +252,42 @@ function MobileNav({ onNavigate }) {
 }
 
 export default function Shell() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [languageMenuClosing, setLanguageMenuClosing] = useState(false);
+  const languageCloseTimer = useRef(null);
   const { toast, t } = useApp();
+  const handleLanguageMenuChange = (open) => {
+    if (languageCloseTimer.current) {
+      window.clearTimeout(languageCloseTimer.current);
+      languageCloseTimer.current = null;
+    }
+    if (open) {
+      setLanguageMenuOpen(true);
+      setLanguageMenuClosing(false);
+      return;
+    }
+    setLanguageMenuOpen(false);
+    setLanguageMenuClosing(true);
+    languageCloseTimer.current = window.setTimeout(() => {
+      setLanguageMenuClosing(false);
+      languageCloseTimer.current = null;
+    }, 240);
+  };
   return (
     <div className="app-shell">
-      <div
-        className={`mobile-drawer-backdrop ${menuOpen ? "visible" : ""}`}
-        onClick={() => setMenuOpen(false)}
-      />
-      <div className={`sidebar-wrap ${menuOpen ? "open" : ""}`}>
-        <button
-          className="drawer-close icon-button"
-          onClick={() => setMenuOpen(false)}
-          aria-label={t("common.close")}
-        >
-          <X size={20} />
-        </button>
-        <Sidebar onNavigate={() => setMenuOpen(false)} />
+      <div className="sidebar-wrap">
+        <Sidebar />
       </div>
-      <div className="main-shell">
-        <Topbar onMenu={() => setMenuOpen(true)} />
+      <div
+        className={`main-shell ${
+          languageMenuOpen ? "language-menu-open" : ""
+        } ${languageMenuClosing ? "language-menu-closing" : ""}`}
+      >
+        <Topbar onLanguageMenuChange={handleLanguageMenuChange} />
         <div className="page-scroll">
           <Outlet />
         </div>
-        <MobileNav onNavigate={() => setMenuOpen(false)} />
+        <MobileNav />
       </div>
       {toast && (
         <div className="toast" role="status" aria-live="polite">
