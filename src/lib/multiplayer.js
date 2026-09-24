@@ -603,7 +603,7 @@ export function useMultiplayerRoom({
         roundMetadata?.level,
         deterministicLevel(round),
       );
-      const generated = getPuzzle(difficulty, level);
+      const generated = getPuzzle(difficulty, level, locale);
       const metadataCategory =
         roundMetadata?.category && roundMetadata.category !== "random"
           ? roundMetadata.category

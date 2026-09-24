@@ -1133,7 +1133,7 @@ export default function App() {
           : t("puzzle.hint", { clues: localizedClues });
       try {
         const result = await requestAiHint({
-          prompt: `${t(puzzle.promptKey)}\n\n${
+          prompt: `${puzzle.prompt}\n\n${
             puzzle.answerType === "letters"
               ? t("puzzle.lettersPrompt")
               : t("single.enterCode")

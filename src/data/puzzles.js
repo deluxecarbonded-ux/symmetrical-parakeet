@@ -1,3 +1,5 @@
+import { LOCALE_PUZZLES } from "./locale_puzzles.js";
+
 const blueprints = [
   {
     category: "Logic",
@@ -271,13 +273,18 @@ function digitClueKeys(code) {
   ];
 }
 
-function makePuzzle(level, difficulty) {
+function makePuzzle(level, difficulty, locale = "en") {
   const blueprint = blueprints[level - 1];
   const meta = difficultyMeta[difficulty];
   const wordPuzzle = WORD_PUZZLES[level];
-  const answerType = wordPuzzle ? "letters" : "digits";
-  const code = wordPuzzle ? null : (DIGIT_ANSWERS[level] || "0000");
-  const answer = wordPuzzle?.answer || code;
+  const localeRow =
+    locale && locale !== "en" ? LOCALE_PUZZLES[locale]?.[level] : null;
+  const answerType = localeRow?.answerType || (wordPuzzle ? "letters" : "digits");
+  const code =
+    wordPuzzle || localeRow?.answerType === "letters"
+      ? null
+      : localeRow?.answer || DIGIT_ANSWERS[level] || "0000";
+  const answer = localeRow?.answer || wordPuzzle?.answer || code;
   const clueKeys = answerType === "digits" ? digitClueKeys(code) : [];
   return {
     id: `${difficulty}-${level}`,
@@ -286,13 +293,14 @@ function makePuzzle(level, difficulty) {
     difficultyLabel: meta.label,
     difficultyRank: meta.rank,
     category: blueprint.category,
-    prompt: wordPuzzle?.prompt || blueprint.prompt,
-    promptKey:
-      wordPuzzle?.promptKey ||
-      `puzzle.prompt.${String(level).padStart(2, "0")}`,
+    prompt: localeRow?.prompt || wordPuzzle?.prompt || blueprint.prompt,
+    promptKey: localeRow
+      ? null
+      : wordPuzzle?.promptKey ||
+        `puzzle.prompt.${String(level).padStart(2, "0")}`,
     answer,
     answerType,
-    answerKey: wordPuzzle?.answerKey || null,
+    answerKey: localeRow ? null : wordPuzzle?.answerKey || null,
     code: answerType === "digits" ? code : null,
     clueKeys,
     points: [40, 55, 70, 85][meta.rank - 1] + level,
@@ -310,11 +318,13 @@ export const DIFFICULTIES = [
   { id: "hard", label: "Hard", description: "No easy answers", levels: 30 },
 ];
 
-export const getPuzzle = (difficulty, level) =>
-  makePuzzle(Math.min(30, Math.max(1, level)), difficulty);
+export const getPuzzle = (difficulty, level, locale = "en") =>
+  makePuzzle(Math.min(30, Math.max(1, level)), difficulty, locale);
 
-export const getPuzzleList = (difficulty) =>
-  Array.from({ length: 30 }, (_, index) => getPuzzle(difficulty, index + 1));
+export const getPuzzleList = (difficulty, locale = "en") =>
+  Array.from({ length: 30 }, (_, index) =>
+    getPuzzle(difficulty, index + 1, locale),
+  );
 
 export const getCategory = (category) => category;
 

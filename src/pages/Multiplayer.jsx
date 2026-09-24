@@ -641,7 +641,7 @@ function Match({ room, currentPlayer, onAnswer, onNext, onLeave }) {
                 {formatCode(String(room.round + 1).padStart(2, "0"), locale)}
               </span>
             </div>
-            <p>{t(puzzle.promptKey)}</p>
+            <p>{puzzle.prompt}</p>
             <div className="match-clue-footer">
               <span>
                 <UsersRound size={15} /> {t("multi.players")}:{" "}

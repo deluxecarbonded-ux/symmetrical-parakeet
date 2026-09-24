@@ -69,13 +69,17 @@ export default function SingleGame() {
   const [elapsed, setElapsed] = useState(0);
   const [startedAt, setStartedAt] = useState(Date.now());
   const inputRef = useRef(null);
-  const puzzle = useMemo(
-    () => getPuzzle(difficulty, level),
-    [difficulty, level],
-  );
   const locale = settings.locale || "en";
+  const puzzle = useMemo(
+    () => getPuzzle(difficulty, level, locale),
+    [difficulty, level, locale],
+  );
   const expectedAnswer =
-    puzzle.answerType === "letters" ? t(puzzle.answerKey) : puzzle.answer;
+    puzzle.answerType === "letters"
+      ? puzzle.answerKey
+        ? t(puzzle.answerKey)
+        : puzzle.answer
+      : puzzle.answer;
   const localizedClues = puzzle.clueKeys.length
     ? puzzle.clueKeys.map((key) => t(key)).join(" · ")
     : t("puzzle.lettersHint");
@@ -240,7 +244,7 @@ export default function SingleGame() {
                 {formatCode(String(level).padStart(2, "0"), locale)}
               </span>
             </div>
-            <p className="clue-prompt">{t(puzzle.promptKey)}</p>
+            <p className="clue-prompt">{puzzle.prompt}</p>
             <div className="clue-footer">
               <span>
                 <Hash size={15} /> {t(`puzzle.answerType.${puzzle.answerType}`)}

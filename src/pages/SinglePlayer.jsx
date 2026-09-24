@@ -48,7 +48,7 @@ export default function SinglePlayer() {
     0,
   );
   const completion = Math.round((total / 90) * 100);
-  const currentPuzzle = getPuzzle(difficulty, currentLevel);
+  const currentPuzzle = getPuzzle(difficulty, currentLevel, settings.locale);
   const rows = useMemo(
     () => Array.from({ length: 30 }, (_, index) => index + 1),
     [],
@@ -195,7 +195,7 @@ export default function SinglePlayer() {
                 const done = completed.includes(level);
                 const unlocked = isUnlocked(level);
                 const active = level === currentLevel && !done;
-                const puzzle = getPuzzle(difficulty, level);
+                const puzzle = getPuzzle(difficulty, level, settings.locale);
                 return (
                   <button
                     key={level}
@@ -249,7 +249,7 @@ export default function SinglePlayer() {
               <span>/ {formatLocalizedInteger(30, settings.locale)}</span>
             </div>
             <h3>{t(`category.${currentPuzzle.category.toLowerCase()}`)}</h3>
-            <p>{t(currentPuzzle.promptKey)}</p>
+            <p>{currentPuzzle.prompt}</p>
             <Button
               className="full-button"
               onClick={() => openLevel(currentLevel)}
