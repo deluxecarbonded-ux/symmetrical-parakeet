@@ -109,6 +109,26 @@ export default function App() {
   }, []);
   const settingsHydratedRef = useRef(false);
   const hydrationRequestRef = useRef(0);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [languageMenuClosing, setLanguageMenuClosing] = useState(false);
+  const languageCloseTimer = useRef(null);
+  const onLanguageMenuChange = useCallback((open) => {
+    if (languageCloseTimer.current) {
+      window.clearTimeout(languageCloseTimer.current);
+      languageCloseTimer.current = null;
+    }
+    if (open) {
+      setLanguageMenuOpen(true);
+      setLanguageMenuClosing(false);
+      return;
+    }
+    setLanguageMenuOpen(false);
+    setLanguageMenuClosing(true);
+    languageCloseTimer.current = window.setTimeout(() => {
+      setLanguageMenuClosing(false);
+      languageCloseTimer.current = null;
+    }, 240);
+  }, []);
 
   const hydrateFromSupabase = useCallback(async () => {
     if (!isSupabaseConfigured) return;
@@ -869,6 +889,9 @@ export default function App() {
       inventory,
       activity,
       toast,
+      languageMenuOpen,
+      languageMenuClosing,
+      onLanguageMenuChange,
       showToast,
       t,
       recordSingleWin,
@@ -884,6 +907,9 @@ export default function App() {
       activity,
       authBusy,
       equipItem,
+      languageMenuClosing,
+      languageMenuOpen,
+      onLanguageMenuChange,
       getAiHint,
       inventory,
       multiplayer,

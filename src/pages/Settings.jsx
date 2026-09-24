@@ -25,7 +25,14 @@ import { formatDigitSequence, getNumberingSystem } from "../lib/numerals";
 import SelectMenu from "../components/SelectMenu";
 
 export default function Settings() {
-  const { t, settings, updateSettings, resetProgress, showToast } = useApp();
+  const {
+    t,
+    settings,
+    updateSettings,
+    resetProgress,
+    showToast,
+    onLanguageMenuChange,
+  } = useApp();
   const [confirmReset, setConfirmReset] = useState(false);
   return (
     <main className="page settings-page">
@@ -90,12 +97,14 @@ export default function Settings() {
               <div className="language-select">
                 <Globe2 size={15} />
                 <SelectMenu
+                  className="settings-language-menu"
                   value={settings.locale}
                   options={LANGUAGES.map(([code, label]) => ({
                     value: code,
                     label,
                   }))}
                   onChange={(value) => updateSettings({ locale: value })}
+                  onOpenChange={onLanguageMenuChange}
                   ariaLabel={t("language")}
                 />
               </div>

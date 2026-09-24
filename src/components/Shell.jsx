@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -252,27 +251,13 @@ function MobileNav({ onNavigate }) {
 }
 
 export default function Shell() {
-  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
-  const [languageMenuClosing, setLanguageMenuClosing] = useState(false);
-  const languageCloseTimer = useRef(null);
-  const { toast, t } = useApp();
-  const handleLanguageMenuChange = (open) => {
-    if (languageCloseTimer.current) {
-      window.clearTimeout(languageCloseTimer.current);
-      languageCloseTimer.current = null;
-    }
-    if (open) {
-      setLanguageMenuOpen(true);
-      setLanguageMenuClosing(false);
-      return;
-    }
-    setLanguageMenuOpen(false);
-    setLanguageMenuClosing(true);
-    languageCloseTimer.current = window.setTimeout(() => {
-      setLanguageMenuClosing(false);
-      languageCloseTimer.current = null;
-    }, 240);
-  };
+  const {
+    toast,
+    t,
+    languageMenuOpen,
+    languageMenuClosing,
+    onLanguageMenuChange,
+  } = useApp();
   return (
     <div className="app-shell">
       <div className="sidebar-wrap">
@@ -283,7 +268,7 @@ export default function Shell() {
           languageMenuOpen ? "language-menu-open" : ""
         } ${languageMenuClosing ? "language-menu-closing" : ""}`}
       >
-        <Topbar onLanguageMenuChange={handleLanguageMenuChange} />
+        <Topbar onLanguageMenuChange={onLanguageMenuChange} />
         <div className="page-scroll">
           <Outlet />
         </div>

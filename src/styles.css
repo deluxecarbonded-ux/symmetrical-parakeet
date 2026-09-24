@@ -4830,8 +4830,12 @@ select {
   .topbar-language-menu .select-menu-content.is-open {
     animation-name: languageMenuDown;
   }
-  .topbar-language-menu .select-menu-content.is-closed {
+  .topbar-language-menu .select-menu-content.is-closed,
+  .settings-language-menu .select-menu-content.is-closed {
     animation-name: languageMenuUp;
+  }
+  .settings-language-menu .select-menu-content.is-open {
+    animation-name: languageMenuDown;
   }
 }
 
