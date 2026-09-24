@@ -9,6 +9,7 @@ import {
 } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Shell from "./components/Shell";
+import NotificationToaster from "./components/NotificationToaster";
 import Dashboard from "./pages/Dashboard";
 import SinglePlayer from "./pages/SinglePlayer";
 import SingleGame from "./pages/SingleGame";
@@ -29,6 +30,11 @@ import {
   publicUsername,
 } from "./lib/identity";
 import { makeId, useMemoryValue } from "./lib/storage";
+import {
+  NOTIFICATION_TONES,
+  inferNotificationTone,
+  notificationDuration,
+} from "./lib/notifications";
 import { useRealtimeInvalidation } from "./lib/realtime";
 
 export const AppContext = createContext(null);
@@ -186,7 +192,7 @@ export default function App() {
   const [wallet, setWallet] = useMemoryValue(initialWallet);
   const [inventory, setInventory] = useMemoryValue(initialInventory);
   const [activity, setActivity] = useMemoryValue([]);
-  const [toast, setToast] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [authBusy, setAuthBusy] = useState(false);
   const [realtimeStatus, setRealtimeStatus] = useState("offline");
   const [realtimeEvent, setRealtimeEvent] = useState(null);
@@ -204,9 +210,32 @@ export default function App() {
       displayName: username || t("profile.defaultPlayerName"),
     };
   }, [profile, t]);
-  const showToast = useCallback((key, values) => {
-    setToast({ key, values, id: Date.now() });
+  const notificationSequenceRef = useRef(0);
+  const showToast = useCallback((key, values, options = {}) => {
+    const notificationOptions = options || {};
+    const tone =
+      NOTIFICATION_TONES[notificationOptions.tone] || inferNotificationTone(key);
+    const id = `notification-${++notificationSequenceRef.current}`;
+    setNotifications((current) =>
+      [
+        {
+          id,
+          key,
+          values: values || {},
+          tone,
+          duration:
+            notificationOptions.duration ?? notificationDuration(tone),
+        },
+        ...current,
+      ].slice(0, 5),
+    );
+    return id;
   }, []);
+  const dismissNotification = useCallback((id) => {
+    setNotifications((current) => current.filter((item) => item.id !== id));
+  }, []);
+  const clearNotifications = useCallback(() => setNotifications([]), []);
+  const toast = notifications[0] || null;
   const settingsHydratedRef = useRef(false);
   const preferencesSnapshotRef = useRef(null);
   const preferencesDirtyRef = useRef(false);
@@ -483,12 +512,6 @@ export default function App() {
         window.clearTimeout(themeTransitionTimer.current);
     };
   }, []);
-
-  useEffect(() => {
-    if (!toast) return undefined;
-    const timeout = window.setTimeout(() => setToast(null), 3200);
-    return () => window.clearTimeout(timeout);
-  }, [toast]);
 
   const updateSettings = useCallback(
     (patch) => {
@@ -874,7 +897,9 @@ export default function App() {
     setWallet(initialWallet);
     setInventory(initialInventory);
     setActivity([]);
+    clearNotifications();
   }, [
+    clearNotifications,
     setActivity,
     setInventory,
     setProgress,
@@ -932,7 +957,7 @@ export default function App() {
       },
     );
     return () => listener?.subscription?.unsubscribe();
-  }, [profile?.id, setProfiles, setSettings]);
+  }, [clearNotifications, profile?.id, setProfiles, setSettings]);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !profile) {
@@ -1117,7 +1142,11 @@ export default function App() {
       wallet,
       inventory,
       activity,
+      notifications,
       toast,
+      notify: showToast,
+      dismissNotification,
+      clearNotifications,
       realtimeStatus,
       realtimeEvent,
       languageMenuOpen,
@@ -1138,6 +1167,9 @@ export default function App() {
     [
       activity,
       authBusy,
+      clearNotifications,
+      dismissNotification,
+      notifications,
       equipItem,
       languageMenuClosing,
       languageMenuOpen,
@@ -1169,6 +1201,7 @@ export default function App() {
 
   return (
     <AppContext.Provider value={value}>
+      <NotificationToaster />
       <Routes>
         <Route element={<Shell />}>
           <Route index element={<Dashboard />} />

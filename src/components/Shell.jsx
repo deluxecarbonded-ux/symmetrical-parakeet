@@ -310,7 +310,6 @@ function MobileNav({ onNavigate }) {
 
 export default function Shell() {
   const {
-    toast,
     t,
     languageMenuOpen,
     languageMenuClosing,
@@ -332,14 +331,6 @@ export default function Shell() {
         </div>
         <MobileNav />
       </div>
-      {toast && (
-        <div className="toast" role="status" aria-live="polite">
-          <span className="toast-mark">
-            <Sparkles size={14} />
-          </span>
-          <span>{t(toast.key, toast.values)}</span>
-        </div>
-      )}
     </div>
   );
 }

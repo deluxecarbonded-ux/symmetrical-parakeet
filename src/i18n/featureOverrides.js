@@ -1,3 +1,5 @@
+import { notificationOverrides } from "./notificationOverrides.js";
+
 const titles = {
   en: {
     "achievement.single.first_crack.title": "First crack",
@@ -406,7 +408,13 @@ const metricLabels = {
 export const featureOverrides = Object.fromEntries(
   Object.keys(common).map((locale) => [
     locale,
-    { ...common[locale], ...pageCopy[locale], ...metricLabels[locale], ...titles[locale] },
+    {
+      ...common[locale],
+      ...pageCopy[locale],
+      ...metricLabels[locale],
+      ...titles[locale],
+      ...notificationOverrides[locale],
+    },
   ]),
 );
 
