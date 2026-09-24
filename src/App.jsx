@@ -29,6 +29,7 @@ import {
   publicUsername,
 } from "./lib/identity";
 import { makeId, useMemoryValue } from "./lib/storage";
+import { useRealtimeInvalidation } from "./lib/realtime";
 
 export const AppContext = createContext(null);
 
@@ -117,6 +118,59 @@ function resolveMediaType(file) {
   return { kind: "", mimeType: declared };
 }
 
+function snapshotPreferences(settings) {
+  return {
+    theme: settings.theme,
+    locale: settings.locale,
+    sound: settings.sound,
+    reduceMotion: settings.reduceMotion,
+  };
+}
+
+function samePreferences(left, right) {
+  return Boolean(
+    left &&
+      right &&
+      left.theme === right.theme &&
+      left.locale === right.locale &&
+      left.sound === right.sound &&
+      left.reduceMotion === right.reduceMotion,
+  );
+}
+
+const REALTIME_SUBSCRIPTION_TABLES = Object.freeze([
+  "profiles",
+  "single_player_profiles",
+  "multiplayer_profiles",
+  "single_player_progress",
+  "single_player_wallets",
+  "multiplayer_wallets",
+  "single_player_inventory",
+  "multiplayer_inventory",
+  "user_achievements",
+  "achievement_definitions",
+  "shop_items",
+  "shop_purchases",
+  "translation_catalogs",
+  "wallet_transactions",
+  "leaderboard_revision",
+  "game_events",
+]);
+
+const APP_REALTIME_TABLES = new Set([
+  "profiles",
+  "single_player_profiles",
+  "multiplayer_profiles",
+  "single_player_progress",
+  "single_player_wallets",
+  "multiplayer_wallets",
+  "single_player_inventory",
+  "multiplayer_inventory",
+  "shop_purchases",
+  "wallet_transactions",
+  "game_events",
+]);
+
 export default function App() {
   const location = useLocation();
   const activeMode = location.pathname.startsWith("/multi")
@@ -134,6 +188,8 @@ export default function App() {
   const [activity, setActivity] = useMemoryValue([]);
   const [toast, setToast] = useState(null);
   const [authBusy, setAuthBusy] = useState(false);
+  const [realtimeStatus, setRealtimeStatus] = useState("offline");
+  const [realtimeEvent, setRealtimeEvent] = useState(null);
 
   const t = useCallback(
     (key, values) => translate(settings.locale, key, values),
@@ -152,7 +208,12 @@ export default function App() {
     setToast({ key, values, id: Date.now() });
   }, []);
   const settingsHydratedRef = useRef(false);
+  const preferencesSnapshotRef = useRef(null);
+  const preferencesDirtyRef = useRef(false);
   const hydrationRequestRef = useRef(0);
+  const realtimeEventIdRef = useRef(0);
+  const realtimeHydrationTimerRef = useRef(null);
+  const previousRealtimeStatusRef = useRef(null);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
   const [languageMenuClosing, setLanguageMenuClosing] = useState(false);
   const languageCloseTimer = useRef(null);
@@ -177,7 +238,7 @@ export default function App() {
     }, 240);
   }, []);
 
-  const hydrateFromSupabase = useCallback(async () => {
+  const hydrateFromSupabase = useCallback(async ({ silent = false } = {}) => {
     if (!isSupabaseConfigured) return;
     const requestId = ++hydrationRequestRef.current;
     try {
@@ -186,15 +247,18 @@ export default function App() {
       const state = data || {};
       if (requestId !== hydrationRequestRef.current) return;
       if (state.profile?.id) {
-        const serverProfile = {
-          ...profile,
-          ...state.profile,
-        };
-        setProfiles((current) => ({
-          ...current,
-          single: serverProfile,
-          multi: serverProfile,
-        }));
+        setProfiles((current) => {
+          const baseProfile = current.single || current.multi || {};
+          const serverProfile = {
+            ...baseProfile,
+            ...state.profile,
+          };
+          return {
+            ...current,
+            single: serverProfile,
+            multi: serverProfile,
+          };
+        });
       }
       const rows = state.single_progress || [];
       const completed = {};
@@ -225,11 +289,16 @@ export default function App() {
       const profileState = state.profile || {};
       const preferences = profileState.preferences || {};
 
-      setSettings((current) => ({
-        ...current,
-        ...preferences,
-        locale: preferences.locale || profileState.locale || current.locale,
-      }));
+      setSettings((current) => {
+        if (preferencesDirtyRef.current) return current;
+        const nextSettings = {
+          ...current,
+          ...preferences,
+          locale: preferences.locale || profileState.locale || current.locale,
+        };
+        preferencesSnapshotRef.current = snapshotPreferences(nextSettings);
+        return nextSettings;
+      });
       settingsHydratedRef.current = true;
       const serverActivity = state.activity || [];
       const singleHistory = serverActivity
@@ -304,7 +373,7 @@ export default function App() {
         })),
       );
     } catch {
-      showToast("toast.syncUnavailable");
+      if (!silent) showToast("toast.syncUnavailable");
     }
   }, [
     setActivity,
@@ -314,6 +383,65 @@ export default function App() {
     setWallet,
     showToast,
   ]);
+
+  const scheduleRealtimeHydration = useCallback(() => {
+    if (realtimeHydrationTimerRef.current) {
+      window.clearTimeout(realtimeHydrationTimerRef.current);
+    }
+    realtimeHydrationTimerRef.current = window.setTimeout(() => {
+      realtimeHydrationTimerRef.current = null;
+      void hydrateFromSupabase({ silent: true });
+    }, 120);
+  }, [hydrateFromSupabase]);
+
+  const handleRealtimeChange = useCallback(
+    (change) => {
+      const table = String(change?.table || change?.schemaTable || "");
+      if (!table) return;
+      setRealtimeEvent({
+        id: ++realtimeEventIdRef.current,
+        table,
+        event: String(change?.event || change?.eventType || "change"),
+        at: change?.at || new Date().toISOString(),
+      });
+      if (APP_REALTIME_TABLES.has(table)) scheduleRealtimeHydration();
+    },
+    [scheduleRealtimeHydration],
+  );
+
+  const realtimeConnection = useRealtimeInvalidation({
+    tables: REALTIME_SUBSCRIPTION_TABLES,
+    onChange: handleRealtimeChange,
+    enabled: Boolean(isSupabaseConfigured && profile?.id),
+    debounceMs: 50,
+  });
+
+  useEffect(() => {
+    setRealtimeStatus(
+      isSupabaseConfigured && profile?.id ? realtimeConnection.status : "offline",
+    );
+  }, [isSupabaseConfigured, profile?.id, realtimeConnection.status]);
+
+  useEffect(() => {
+    const previousStatus = previousRealtimeStatusRef.current;
+    if (
+      realtimeStatus === "live" &&
+      previousStatus &&
+      previousStatus !== "live" &&
+      profile?.id
+    ) {
+      void hydrateFromSupabase({ silent: true });
+    }
+    previousRealtimeStatusRef.current = realtimeStatus;
+  }, [hydrateFromSupabase, profile?.id, realtimeStatus]);
+
+  useEffect(() => {
+    return () => {
+      if (realtimeHydrationTimerRef.current) {
+        window.clearTimeout(realtimeHydrationTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -362,42 +490,42 @@ export default function App() {
     return () => window.clearTimeout(timeout);
   }, [toast]);
 
-  const setActiveProfile = useCallback(
-    (nextOrUpdater) => {
-      setProfiles((current) => ({
-        ...current,
-        [activeMode]:
-          typeof nextOrUpdater === "function"
-            ? nextOrUpdater(current[activeMode])
-            : nextOrUpdater,
-      }));
-    },
-    [activeMode, setProfiles],
-  );
-
   const updateSettings = useCallback(
-    (patch) => setSettings((current) => ({ ...current, ...patch })),
-    [setSettings],
+    (patch) => {
+      setSettings((current) => {
+        const next = { ...current, ...patch };
+        if (profile?.id && settingsHydratedRef.current) {
+          preferencesDirtyRef.current = true;
+        }
+        return next;
+      });
+    },
+    [profile?.id, setSettings],
   );
   useEffect(() => {
-    if (!isSupabaseConfigured || !profile || !settingsHydratedRef.current)
+    if (!isSupabaseConfigured || !profile?.id || !settingsHydratedRef.current)
       return undefined;
+    const snapshot = snapshotPreferences(settings);
+    if (samePreferences(snapshot, preferencesSnapshotRef.current)) {
+      return undefined;
+    }
+    preferencesSnapshotRef.current = snapshot;
     const timeout = window.setTimeout(() => {
       supabase
         .rpc("update_user_preferences", {
-          p_preferences: {
-            theme: settings.theme,
-            locale: settings.locale,
-            sound: settings.sound,
-            reduceMotion: settings.reduceMotion,
-          },
+          p_preferences: snapshot,
         })
         .then(({ error }) => {
-          if (error) showToast("toast.syncUnavailable");
+          if (error) {
+            preferencesSnapshotRef.current = null;
+            showToast("toast.syncUnavailable");
+          } else {
+            preferencesDirtyRef.current = false;
+          }
         });
     }, 250);
     return () => window.clearTimeout(timeout);
-  }, [profile, settings, showToast]);
+  }, [profile?.id, settings, showToast]);
   useEffect(() => {
     if (!LANGUAGES.some(([code]) => code === settings.locale)) {
       updateSettings({ locale: "en" });
@@ -644,6 +772,11 @@ export default function App() {
           await supabase.auth.signInWithPassword(credentials);
         if (error) throw error;
         const next = profileFromAuthUser(data.user);
+        hydrationRequestRef.current += 1;
+        preferencesSnapshotRef.current = null;
+        preferencesDirtyRef.current = false;
+        setRealtimeEvent(null);
+        setRealtimeStatus("connecting");
         setProfiles((current) => ({ ...current, single: next, multi: next }));
         return next;
       } catch (error) {
@@ -695,6 +828,11 @@ export default function App() {
           username,
           createdAt: new Date().toISOString(),
         };
+        hydrationRequestRef.current += 1;
+        preferencesSnapshotRef.current = null;
+        preferencesDirtyRef.current = false;
+        setRealtimeEvent(null);
+        setRealtimeStatus("connecting");
         if (data.user)
           setProfiles((current) => ({
             ...current,
@@ -724,8 +862,13 @@ export default function App() {
   );
 
   const signOut = useCallback(async () => {
+    hydrationRequestRef.current += 1;
+    preferencesSnapshotRef.current = null;
+    preferencesDirtyRef.current = false;
     if (isSupabaseConfigured) await supabase.auth.signOut();
     setProfiles({ single: null, multi: null });
+    setRealtimeEvent(null);
+    setRealtimeStatus("offline");
     setSettings(initialSettings);
     setProgress(initialProgress);
     setWallet(initialWallet);
@@ -765,7 +908,12 @@ export default function App() {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === "SIGNED_OUT") {
+          hydrationRequestRef.current += 1;
+          preferencesSnapshotRef.current = null;
+          preferencesDirtyRef.current = false;
           setProfiles({ single: null, multi: null });
+          setRealtimeEvent(null);
+          setRealtimeStatus("offline");
           setSettings(initialSettings);
           setProgress(initialProgress);
           setWallet(initialWallet);
@@ -774,13 +922,17 @@ export default function App() {
           return;
         }
         if (session?.user && profile?.id !== session.user.id) {
+          hydrationRequestRef.current += 1;
+          preferencesSnapshotRef.current = null;
+          preferencesDirtyRef.current = false;
+          setRealtimeEvent(null);
           const next = profileFromAuthUser(session.user);
           setProfiles((current) => ({ ...current, single: next, multi: next }));
         }
       },
     );
     return () => listener?.subscription?.unsubscribe();
-  }, [profile, setProfiles, setSettings]);
+  }, [profile?.id, setProfiles, setSettings]);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !profile) {
@@ -895,7 +1047,7 @@ export default function App() {
       showToast("profile.mediaUpdated");
       return data;
     },
-    [activeMode, profile, setProfiles, showToast],
+    [profile, setProfiles, showToast],
   );
 
   const resetProgress = useCallback(async () => {
@@ -966,6 +1118,8 @@ export default function App() {
       inventory,
       activity,
       toast,
+      realtimeStatus,
+      realtimeEvent,
       languageMenuOpen,
       languageMenuClosing,
       onLanguageMenuChange,
@@ -993,6 +1147,8 @@ export default function App() {
       multiplayer,
       playCue,
       profileView,
+      realtimeEvent,
+      realtimeStatus,
       progress,
       purchaseItem,
       recordSingleWin,

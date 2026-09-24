@@ -117,10 +117,24 @@ const catalog = {
 };
 
 export default function Shop({ mode = "single" }) {
-  const { t, wallet, inventory, settings, purchaseItem, equipItem, showToast } =
-    useApp();
+  const {
+    t,
+    wallet,
+    inventory,
+    settings,
+    purchaseItem,
+    equipItem,
+    showToast,
+    realtimeEvent,
+  } = useApp();
   const [filter, setFilter] = useState("all");
   const [remoteCatalog, setRemoteCatalog] = useState(null);
+  const [catalogVersion, setCatalogVersion] = useState(0);
+  useEffect(() => {
+    if (realtimeEvent?.table === "shop_items") {
+      setCatalogVersion((value) => value + 1);
+    }
+  }, [realtimeEvent?.id, realtimeEvent?.table]);
   useEffect(() => {
     let cancelled = false;
     if (!isSupabaseConfigured) {
@@ -140,7 +154,7 @@ export default function Shop({ mode = "single" }) {
     return () => {
       cancelled = true;
     };
-  }, [mode]);
+  }, [catalogVersion, mode]);
   const items = useMemo(() => {
     const localItems = catalog[mode] || [];
     if (!remoteCatalog) return localItems;

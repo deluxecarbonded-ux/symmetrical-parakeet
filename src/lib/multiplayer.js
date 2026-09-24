@@ -119,6 +119,7 @@ function mapRoundRows(roundRows, puzzleRows) {
         winnerId:
           row?.winner_profile_id ||
           row?.winnerProfileId ||
+          row?.winnerProfileID ||
           row?.winnerId ||
           null,
       };
@@ -371,62 +372,21 @@ export function useMultiplayerRoom({
         : roomResult?.data;
       if (!roomRow?.id) return null;
 
-      const [initialPlayersResult, roundsResult] = await Promise.all([
-        supabase
-          .from("multiplayer_players")
-          .select(
-            "room_id,profile_id,username,display_name,ready,score,codes_cracked,avatar_url,avatar_bucket,avatar_media_type,joined_at",
-          )
-          .eq("room_id", roomRow.id)
-          .order("joined_at", { ascending: true }),
-        supabase
-          .from("multiplayer_rounds")
-          .select(
-            "room_id,round_number,category,puzzle_id,started_at,winner_profile_id",
-          )
-          .eq("room_id", roomRow.id)
-          .order("round_number", { ascending: true }),
-      ]);
-      let playersResult = initialPlayersResult;
-      if (
-        playersResult?.error &&
-        /column|avatar|username|relation/i.test(String(playersResult.error.message || ""))
-      ) {
-        playersResult = await supabase
-          .from("multiplayer_players")
-          .select(
-            "room_id,profile_id,display_name,ready,score,codes_cracked,joined_at",
-          )
-          .eq("room_id", roomRow.id)
-          .order("joined_at", { ascending: true });
-      }
-      if (playersResult?.error) throw playersResult.error;
-      if (roundsResult?.error) throw roundsResult.error;
-
-      const roundRows = asRows(roundsResult?.data);
-      const puzzleIds = [
-        ...new Set(
-          roundRows
-            .map((row) => roundPuzzleId(row))
-            .filter(Boolean)
-            .map(String),
-        ),
-      ];
-      let puzzleRows = [];
-      if (puzzleIds.length) {
-        const puzzleResult = await supabase
-          .from("content_puzzles")
-          .select("id,difficulty,level,category,answer_type,points")
-          .in("id", puzzleIds);
-        if (puzzleResult?.error) throw puzzleResult.error;
-        puzzleRows = asRows(puzzleResult?.data);
-      }
+      // The room RPC projects only safe puzzle metadata and never exposes
+      // answer_code/answer_key. This also keeps room loading compatible with
+      // the column-level answer protections in the database.
+      const { data: snapshot, error: snapshotError } = await supabase.rpc(
+        "get_multiplayer_room_state",
+        { p_room_id: roomRow.id },
+      );
+      if (snapshotError) throw snapshotError;
+      if (!snapshot?.room?.id) return null;
 
       return mapRoomRows({
-        roomRow,
-        playerRows: playersResult?.data,
-        roundRows,
-        puzzleRows,
+        roomRow: snapshot.room,
+        playerRows: snapshot.players,
+        roundRows: snapshot.round ? [snapshot.round] : [],
+        puzzleRows: [],
         fallbackName: profile?.username || profile?.displayName || defaultName,
       });
     },
@@ -578,16 +538,6 @@ export function useMultiplayerRoom({
           event: "*",
           schema: "public",
           table: "multiplayer_rounds",
-          filter: `room_id=eq.${room.id}`,
-        },
-        scheduleRefresh,
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "multiplayer_answers",
           filter: `room_id=eq.${room.id}`,
         },
         scheduleRefresh,

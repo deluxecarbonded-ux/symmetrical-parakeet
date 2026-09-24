@@ -174,7 +174,7 @@ function Sidebar({ onNavigate }) {
 }
 
 function Topbar({ onLanguageMenuChange }) {
-  const { t, settings, updateSettings, profile } = useApp();
+  const { t, settings, updateSettings, profile, realtimeStatus } = useApp();
   const location = useLocation();
   const navigate = useNavigate();
   const isMulti = location.pathname.startsWith("/multi");
@@ -203,6 +203,22 @@ function Topbar({ onLanguageMenuChange }) {
         <strong>{pageTitle}</strong>
       </div>
       <div className="topbar-actions">
+        <span
+          className={`realtime-indicator realtime-${realtimeStatus}`}
+          role="status"
+          aria-label={
+            realtimeStatus === "live"
+              ? t("settings.realtimeReady")
+              : t("toast.syncUnavailable")
+          }
+          title={
+            realtimeStatus === "live"
+              ? t("settings.realtimeReady")
+              : t("toast.syncUnavailable")
+          }
+        >
+          <i aria-hidden="true" />
+        </span>
         <div className="language-control">
           <Globe2 size={16} />
           <SelectMenu

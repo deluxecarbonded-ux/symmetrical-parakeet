@@ -10,7 +10,7 @@ Exotic is a responsive code-and-word brain-teaser game built with React, Vite, L
 - Host-selected rounds and categories; random category rotation for time attack
 - Realtime room updates through Supabase Postgres Changes
 - Realtime publication enabled for every application-owned table in the `public` schema, with RLS still controlling client visibility
-- Sensitive puzzle-answer and raw-submission tables remain publication members but are blocked from client SELECT/Realtime delivery by RLS and column privileges
+- Sensitive puzzle-answer, translation-answer, and raw-submission tables remain publication members but are blocked from client SELECT/Realtime delivery by RLS and column privileges
 - Supabase-authoritative profiles, progress, wallets, inventories, activity, rooms, and purchases
 - No browser localStorage, sessionStorage, BroadcastChannel rooms, or fake local accounts
 - Separate single-player and multiplayer wallets, inventories, shops, profiles, and routes
@@ -67,7 +67,7 @@ The app requires Supabase environment variables and does not fall back to browse
 
 Because the browser storage policy is strict, the Supabase client keeps the auth session in memory only (`persistSession: false`); a page reload requires signing in again. This avoids localStorage/sessionStorage while keeping all durable state in Postgres.
 
-Migrations `001` through `012` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data. Migration `010` adds database-backed achievement definitions and progress, ranked leaderboard RPCs, canonical username synchronization, and authenticated profile media buckets/policies; migration `011` hardens the leaderboard response contract; migration `012` makes multiplayer timing and winner aggregation server-derived and idempotent.
+Migrations `001` through `017` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data. Migration `010` adds database-backed achievement definitions and progress, ranked leaderboard RPCs, canonical username synchronization, and authenticated profile media buckets/policies; migration `011` hardens the leaderboard response contract; migration `012` makes multiplayer timing and winner aggregation server-derived and idempotent; migrations `013`–`015` enable Realtime for all public application tables while blocking sensitive answer/submission delivery; migration `016` adds a safe global leaderboard revision signal; migration `017` preserves safe room winner snapshots.
 
 ## Route map
 
@@ -88,6 +88,17 @@ Migrations `001` through `012` are included. The migrations intentionally do not
 - `/single/auth` and `/multi/auth` separated auth entry points
 - `/auth` account entry
 
+## Realtime architecture
+
+`src/lib/realtime.js` provides the shared authenticated subscription manager and hooks:
+
+- `useRealtimeSubscription` / `useRealtimeTable` for table-level events
+- `useRealtimeInvalidation` for debounced refreshes
+- `useRealtimeStatus` for connection state
+- `realtimeManager`, `startRealtime`, `stopRealtime`, and `emitRealtimeTableChange` for app-level/manual invalidation
+
+The App provider keeps one authenticated channel alive while the user is signed in, coalesces account-state changes, and refreshes the dashboard, profile, settings, shop, achievements, and leaderboard views without navigation. Room-specific subscriptions remain isolated to the active multiplayer room. Secret-bearing tables are never client-subscribed.
+
 ## Data model
 
-`supabase/migrations/001_exotic.sql` through `004_match_stats.sql` define the core schema, room lifecycle, rewards, and match statistics. `005_localized_answers.sql` adds word-answer support, `006_supabase_first_state.sql` adds preferences and app-state hydration, `007_server_authority_and_rls.sql` locks private tables behind server-side RPCs, validates solo answers, and publishes only safe realtime state, `008_room_code_compatibility.sql` provides portable room-code generation, and `009_signup_identity_validation.sql` adds normalized usernames and signup availability checks.
+`supabase/migrations/001_exotic.sql` through `004_match_stats.sql` define the core schema, room lifecycle, rewards, and match statistics. `005_localized_answers.sql` adds word-answer support, `006_supabase_first_state.sql` adds preferences and app-state hydration, `007_server_authority_and_rls.sql` locks private tables behind server-side RPCs, validates solo answers, and publishes only safe realtime state, `008_room_code_compatibility.sql` provides portable room-code generation, `009_signup_identity_validation.sql` adds normalized usernames and signup availability checks, and `010`–`017` add achievements, leaderboard/media persistence, realtime publication, revision signals, and safe room projections.

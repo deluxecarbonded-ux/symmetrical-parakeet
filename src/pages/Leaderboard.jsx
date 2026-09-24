@@ -42,6 +42,8 @@ import {
 import { formatNumber } from "../lib/storage";
 import { supabase } from "../lib/supabase";
 
+const LEADERBOARD_REFRESH_TABLES = new Set(["leaderboard_revision"]);
+
 async function requestLeaderboard({ mode, metric, limit }) {
   if (!supabase) {
     return { data: null, error: { message: "Supabase is not configured" } };
@@ -304,7 +306,7 @@ export default function Leaderboard({
   metric: metricProp,
   limit = 50,
 }) {
-  const { t, profile, settings } = useApp();
+  const { t, profile, settings, realtimeEvent } = useApp();
   const normalizedMode = normalizeMode(mode);
   const isMulti = normalizedMode === "multi";
   const isSignedIn = Boolean(profile);
@@ -328,7 +330,7 @@ export default function Leaderboard({
   const [, setError] = useState(null);
   const requestId = useRef(0);
 
-  const loadLeaderboard = useCallback(async () => {
+  const loadLeaderboard = useCallback(async ({ silent = false } = {}) => {
     const currentRequest = ++requestId.current;
     if (!isSignedIn) {
       setRows([]);
@@ -336,8 +338,10 @@ export default function Leaderboard({
       setStatus("auth");
       return;
     }
-    setStatus("loading");
-    setError(null);
+    if (!silent) {
+      setStatus("loading");
+      setError(null);
+    }
     try {
       const response = await requestLeaderboard({
         mode: normalizedMode,
@@ -347,7 +351,7 @@ export default function Leaderboard({
       if (currentRequest !== requestId.current) return;
       if (response?.error) {
         setError(response.error);
-        setStatus("error");
+        if (!silent) setStatus("error");
         return;
       }
       const data = Array.isArray(response?.data) ? response.data : [];
@@ -360,7 +364,7 @@ export default function Leaderboard({
     } catch (requestError) {
       if (currentRequest !== requestId.current) return;
       setError(requestError);
-      setStatus("error");
+      if (!silent) setStatus("error");
     }
   }, [isSignedIn, metric, normalizedMode, safeLimit]);
 
@@ -370,6 +374,25 @@ export default function Leaderboard({
       requestId.current += 1;
     };
   }, [loadLeaderboard]);
+
+  useEffect(() => {
+    if (
+      !isSignedIn ||
+      !realtimeEvent?.id ||
+      !LEADERBOARD_REFRESH_TABLES.has(realtimeEvent.table)
+    ) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void loadLeaderboard({ silent: true });
+    }, 200);
+    return () => window.clearTimeout(timer);
+  }, [
+    isSignedIn,
+    loadLeaderboard,
+    realtimeEvent?.id,
+    realtimeEvent?.table,
+  ]);
 
   const metricChoices = useMemo(() => {
     const available = rows.map((row) => row.metric);

@@ -56,6 +56,19 @@ import { supabase } from "../lib/supabase";
 // and to route modules without making them know about the data helper.
 export { achievementCopy };
 
+const ACHIEVEMENT_REFRESH_TABLES = new Set([
+  "profiles",
+  "single_player_profiles",
+  "multiplayer_profiles",
+  "single_player_progress",
+  "single_player_wallets",
+  "multiplayer_wallets",
+  "single_player_inventory",
+  "multiplayer_inventory",
+  "game_events",
+  "achievement_definitions",
+]);
+
 const achievementIcons = {
   award: Award,
   bar_chart: BarChart3,
@@ -353,7 +366,7 @@ function AchievementState({ type, t, onRetry, authPath, isSignedIn }) {
 }
 
 export default function Achievements({ mode = "single" }) {
-  const { t, profile, settings } = useApp();
+  const { t, profile, settings, realtimeEvent } = useApp();
   const normalizedMode = normalizeMode(mode);
   const isMulti = normalizedMode === "multi";
   const isSignedIn = Boolean(profile);
@@ -363,7 +376,7 @@ export default function Achievements({ mode = "single" }) {
   const [, setError] = useState(null);
   const requestId = useRef(0);
 
-  const loadAchievements = useCallback(async () => {
+  const loadAchievements = useCallback(async ({ silent = false } = {}) => {
     const currentRequest = ++requestId.current;
     if (!isSignedIn) {
       setItems([]);
@@ -372,15 +385,17 @@ export default function Achievements({ mode = "single" }) {
       return;
     }
 
-    setItems([]);
-    setError(null);
-    setStatus("loading");
+    if (!silent) {
+      setItems([]);
+      setError(null);
+      setStatus("loading");
+    }
     try {
       const response = await requestAchievements(normalizedMode);
       if (currentRequest !== requestId.current) return;
       if (response?.error) {
         setError(response.error);
-        setStatus("error");
+        if (!silent) setStatus("error");
         return;
       }
       const rows = Array.isArray(response?.data) ? response.data : [];
@@ -389,7 +404,7 @@ export default function Achievements({ mode = "single" }) {
     } catch (requestError) {
       if (currentRequest !== requestId.current) return;
       setError(requestError);
-      setStatus("error");
+      if (!silent) setStatus("error");
     }
   }, [isSignedIn, normalizedMode]);
 
@@ -399,6 +414,20 @@ export default function Achievements({ mode = "single" }) {
       requestId.current += 1;
     };
   }, [loadAchievements]);
+
+  useEffect(() => {
+    if (
+      !isSignedIn ||
+      !realtimeEvent?.id ||
+      !ACHIEVEMENT_REFRESH_TABLES.has(realtimeEvent.table)
+    ) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void loadAchievements({ silent: true });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [isSignedIn, loadAchievements, realtimeEvent?.id, realtimeEvent?.table]);
 
   const summary = useMemo(() => {
     const total = items.length;
