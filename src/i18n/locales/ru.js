@@ -31,7 +31,6 @@ export default {
   "dashboard.title": "Сделайте следующий ход.",
   "dashboard.subtitle": "Острый ум станет ещё острее после одного задания.",
   "dashboard.welcome": "С возвращением",
-  "dashboard.guest": "Гостевой сеанс",
   "dashboard.noProgress": "Ваше первое решение ещё впереди.",
   "dashboard.beginJourney": "Начните свой путь",
   "dashboard.modesTitle": "Выберите арену",
@@ -184,8 +183,6 @@ export default {
   "profile.lifetime": "Кодов за всё время",
   "profile.account": "Учётная запись",
   "profile.connected": "Подключённая учётная запись",
-  "profile.local": "Это устройство",
-  "profile.guestMode": "Гостевой режим",
   "profile.createAccount": "Создать учётную запись",
   "profile.synced": "Синхронизировано",
   "auth.title": "Войти в Exotic",
@@ -196,12 +193,10 @@ export default {
   "auth.email": "Адрес электронной почты",
   "auth.password": "Пароль",
   "auth.name": "Отображаемое имя",
-  "auth.continueGuest": "Продолжить как гость",
   "auth.terms":
     "Продолжая, вы соглашаетесь играть честно и не раскрывать свои коды другим.",
   "auth.noAccount": "Впервые в Exotic?",
   "auth.haveAccount": "Уже есть учётная запись?",
-  "auth.or": "или",
   "auth.magicLink": "Отправить волшебную ссылку",
   "auth.invalidCredentials": "Проверьте данные и попробуйте снова.",
   "auth.secureNote":
@@ -354,7 +349,6 @@ export default {
   "meta.description":
     "Exotic — логическая игра в реальном времени с кодами из четырёх цифр.",
   "nav.openNavigation": "Открыть навигацию",
-  "profile.defaultGuestName": "Гость",
   "profile.defaultPlayerName": "Игрок",
   "auth.showPassword": "Показать пароль",
   "auth.hidePassword": "Скрыть пароль",

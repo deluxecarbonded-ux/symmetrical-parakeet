@@ -31,7 +31,6 @@ export default {
   "dashboard.title": "Buat langkah berikutnya.",
   "dashboard.subtitle": "Pikiran yang tajam hanya satu teka-teki lagi.",
   "dashboard.welcome": "Selamat datang kembali",
-  "dashboard.guest": "Sesi tamu",
   "dashboard.noProgress": "Temuan pertama Anda masih di depan.",
   "dashboard.beginJourney": "Mulai perjalanan",
   "dashboard.modesTitle": "Pilih arena",
@@ -183,8 +182,6 @@ export default {
   "profile.lifetime": "Kode sepanjang masa",
   "profile.account": "Akun",
   "profile.connected": "Akun terhubung",
-  "profile.local": "Perangkat ini",
-  "profile.guestMode": "Mode tamu",
   "profile.createAccount": "Buat akun",
   "profile.synced": "Tersinkron",
   "auth.title": "Masuk Exotic",
@@ -195,12 +192,10 @@ export default {
   "auth.email": "Alamat email",
   "auth.password": "Kata sandi",
   "auth.name": "Nama tampilan",
-  "auth.continueGuest": "Lanjutkan sebagai tamu",
   "auth.terms":
     "Dengan melanjutkan, Anda setuju bermain adil dan menjaga kode tetap pribadi.",
   "auth.noAccount": "Baru di Exotic?",
   "auth.haveAccount": "Sudah punya akun?",
-  "auth.or": "atau",
   "auth.magicLink": "Kirim tautan magis",
   "auth.invalidCredentials": "Periksa informasi Anda lalu coba lagi.",
   "auth.secureNote":
@@ -273,7 +268,6 @@ export default {
   "meta.description":
     "Exotic — permainan teka-teki real-time untuk kode empat angka.",
   "nav.openNavigation": "Buka navigasi",
-  "profile.defaultGuestName": "Tamu",
   "profile.defaultPlayerName": "Pemain",
   "auth.showPassword": "Tampilkan kata sandi",
   "auth.hidePassword": "Sembunyikan kata sandi",

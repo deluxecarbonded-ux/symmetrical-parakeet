@@ -9,7 +9,6 @@ import {
   Coins,
   Edit3,
   Gamepad2,
-  Globe2,
   KeyRound,
   LogIn,
   LogOut,
@@ -90,35 +89,23 @@ export default function Profile({ mode = "single" }) {
                   ? t("profile.soloProgress")
                   : t("profile.multiplayerProgress")}
               </span>
-              <h2>{profile?.displayName || t("dashboard.guest")}</h2>
-              <p>
-                {profile?.email ||
-                  (profile
-                    ? profile.isGuest
-                      ? t("profile.local")
-                      : t("profile.connected")
-                    : t("profile.local"))}
-              </p>
+              <h2>{profile?.displayName || t("nav.signIn")}</h2>
+              <p>{profile?.email || t("nav.signIn")}</p>
               <div className="identity-pills">
-                <Pill
-                  tone="lime"
-                  icon={profile?.isGuest ? Globe2 : ShieldCheck}
-                >
-                  {profile
-                    ? profile.isGuest
-                      ? t("profile.guestMode")
-                      : t("profile.connected")
-                    : t("dashboard.guest")}
+                <Pill tone="lime" icon={ShieldCheck}>
+                  {profile ? t("profile.connected") : t("nav.signIn")}
                 </Pill>
               </div>
             </div>
-            <button
-              className="icon-button profile-edit"
-              onClick={() => setEditing((value) => !value)}
-              aria-label={t("profile.editName")}
-            >
-              <Edit3 size={17} />
-            </button>
+            {profile && (
+              <button
+                className="icon-button profile-edit"
+                onClick={() => setEditing((value) => !value)}
+                aria-label={t("profile.editName")}
+              >
+                <Edit3 size={17} />
+              </button>
+            )}
             {editing && (
               <div className="profile-edit-form">
                 <input
@@ -264,15 +251,9 @@ export default function Profile({ mode = "single" }) {
               <>
                 <div className="account-state">
                   <span className="status-dot online" />
-                  <strong>
-                    {profile.isGuest
-                      ? t("profile.local")
-                      : t("profile.connected")}
-                  </strong>
+                  <strong>{t("profile.connected")}</strong>
                 </div>
-                <p>
-                  {profile.isGuest ? t("auth.continueGuest") : profile.email}
-                </p>
+                <p>{profile.email || t("nav.signIn")}</p>
                 <Button
                   variant="quiet"
                   className="full-button logout-button"
@@ -289,7 +270,7 @@ export default function Profile({ mode = "single" }) {
               <>
                 <div className="account-state">
                   <span className="status-dot" />
-                  <strong>{t("dashboard.guest")}</strong>
+                  <strong>{t("nav.signIn")}</strong>
                 </div>
                 <p>{t("auth.subtitle")}</p>
                 <Button

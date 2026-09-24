@@ -31,7 +31,6 @@ export default {
   "dashboard.title": "Faites votre prochain choix.",
   "dashboard.subtitle": "Un esprit plus vif est à un puzzle de distance.",
   "dashboard.welcome": "Bon retour",
-  "dashboard.guest": "Session d'invité",
   "dashboard.noProgress": "Votre première percée est encore devant vous.",
   "dashboard.beginJourney": "Commencez votre aventure",
   "dashboard.modesTitle": "Choisissez votre arène",
@@ -184,8 +183,6 @@ export default {
   "profile.lifetime": "Codes au total",
   "profile.account": "Compte",
   "profile.connected": "Compte connecté",
-  "profile.local": "Cet appareil",
-  "profile.guestMode": "Mode invité",
   "profile.createAccount": "Créer un compte",
   "profile.synced": "Synchronisé",
   "auth.title": "Entrez dans Exotic",
@@ -196,12 +193,10 @@ export default {
   "auth.email": "Adresse e-mail",
   "auth.password": "Mot de passe",
   "auth.name": "Nom affiché",
-  "auth.continueGuest": "Continuer en invité",
   "auth.terms":
     "En continuant, vous acceptez de jouer équitablement et de garder vos codes pour vous.",
   "auth.noAccount": "Nouveau sur Exotic ?",
   "auth.haveAccount": "Vous avez déjà un compte ?",
-  "auth.or": "ou",
   "auth.magicLink": "Envoyer un lien magique",
   "auth.invalidCredentials": "Vérifiez vos informations et réessayez.",
   "auth.secureNote":
@@ -354,7 +349,6 @@ export default {
   "meta.description":
     "Exotic — un jeu de réflexion en temps réel pour casser des codes à quatre chiffres.",
   "nav.openNavigation": "Ouvrir la navigation",
-  "profile.defaultGuestName": "Invité",
   "profile.defaultPlayerName": "Joueur",
   "auth.showPassword": "Afficher le mot de passe",
   "auth.hidePassword": "Masquer le mot de passe",

@@ -31,7 +31,6 @@ export default {
   "dashboard.title": "Fai la tua prossima mossa.",
   "dashboard.subtitle": "Una mente più acuta è a un enigma di distanza.",
   "dashboard.welcome": "Bentornato",
-  "dashboard.guest": "Sessione ospite",
   "dashboard.noProgress": "La tua prima svolta è ancora davanti a te.",
   "dashboard.beginJourney": "Inizia il tuo percorso",
   "dashboard.modesTitle": "Scegli la tua arena",
@@ -186,8 +185,6 @@ export default {
   "profile.lifetime": "Codici totali",
   "profile.account": "Account",
   "profile.connected": "Account collegato",
-  "profile.local": "Questo dispositivo",
-  "profile.guestMode": "Modalità ospite",
   "profile.createAccount": "Crea account",
   "profile.synced": "Sincronizzato",
   "auth.title": "Entra in Exotic",
@@ -198,12 +195,10 @@ export default {
   "auth.email": "Indirizzo email",
   "auth.password": "Password",
   "auth.name": "Nome visualizzato",
-  "auth.continueGuest": "Continua come ospite",
   "auth.terms":
     "Continuando, accetti di giocare lealmente e di non mostrare i tuoi codici agli altri.",
   "auth.noAccount": "Nuovo in Exotic?",
   "auth.haveAccount": "Hai già un account?",
-  "auth.or": "oppure",
   "auth.magicLink": "Invia un link magico",
   "auth.invalidCredentials": "Controlla i tuoi dati e riprova.",
   "auth.secureNote":
@@ -357,7 +352,6 @@ export default {
   "meta.description":
     "Exotic — un enigma logico in tempo reale con codici a quattro cifre.",
   "nav.openNavigation": "Apri la navigazione",
-  "profile.defaultGuestName": "Ospite",
   "profile.defaultPlayerName": "Giocatore",
   "auth.showPassword": "Mostra la password",
   "auth.hidePassword": "Nascondi la password",

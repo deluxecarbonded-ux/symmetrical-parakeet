@@ -68,7 +68,6 @@ const english = {
   "dashboard.title": "Make your next move.",
   "dashboard.subtitle": "A sharper mind is one puzzle away.",
   "dashboard.welcome": "Welcome back",
-  "dashboard.guest": "Guest session",
   "dashboard.noProgress": "Your first breakthrough is still ahead.",
   "dashboard.beginJourney": "Begin your journey",
   "dashboard.modesTitle": "Choose your arena",
@@ -220,8 +219,6 @@ const english = {
   "profile.lifetime": "Lifetime codes",
   "profile.account": "Account",
   "profile.connected": "Connected account",
-  "profile.local": "This device",
-  "profile.guestMode": "Guest mode",
   "profile.createAccount": "Create account",
   "profile.synced": "Synced",
   "auth.title": "Enter Exotic",
@@ -245,7 +242,6 @@ const english = {
   "auth.validationUnavailable": "Availability could not be checked. Try again.",
   "auth.signupValidation": "Enter a valid email and an available username.",
   "auth.signupFailed": "We couldn't create your account. Try again.",
-  "auth.continueGuest": "Continue as guest",
   "auth.terms":
     "By continuing, you agree to play fairly and keep your codes to yourself.",
   "auth.noAccount": "New to Exotic?",
@@ -314,7 +310,6 @@ const english = {
   "meta.title": "Exotic — Crack the code",
   "meta.description": "Exotic — a four-digit code brain teaser.",
   "nav.openNavigation": "Open navigation",
-  "profile.defaultGuestName": "Guest",
   "profile.defaultPlayerName": "Player",
   "auth.showPassword": "Show password",
   "auth.hidePassword": "Hide password",
@@ -430,7 +425,6 @@ const languageOverrides = {
     "shop.equip": "تجهيز",
     "profile.title": "الملف الشخصي",
     "auth.title": "ادخل Exotic",
-    "auth.continueGuest": "المتابعة كضيف",
     "settings.title": "الإعدادات",
   },
   fr: {
@@ -470,7 +464,6 @@ const languageOverrides = {
     "shop.equip": "Équiper",
     "profile.title": "Profil",
     "auth.title": "Entrez dans Exotic",
-    "auth.continueGuest": "Continuer en invité",
     "settings.title": "Réglages",
   },
   es: {
@@ -510,7 +503,6 @@ const languageOverrides = {
     "shop.equip": "Equipar",
     "profile.title": "Perfil",
     "auth.title": "Entra en Exotic",
-    "auth.continueGuest": "Continuar como invitado",
     "settings.title": "Ajustes",
   },
   de: {
@@ -550,7 +542,6 @@ const languageOverrides = {
     "shop.equip": "Ausrüsten",
     "profile.title": "Profil",
     "auth.title": "Exotic betreten",
-    "auth.continueGuest": "Als Gast fortfahren",
     "settings.title": "Einstellungen",
   },
   pt: {
@@ -590,7 +581,6 @@ const languageOverrides = {
     "shop.equip": "Equipar",
     "profile.title": "Perfil",
     "auth.title": "Entre no Exotic",
-    "auth.continueGuest": "Continuar como convidado",
     "settings.title": "Configurações",
   },
   it: {
@@ -630,7 +620,6 @@ const languageOverrides = {
     "shop.equip": "Equipaggia",
     "profile.title": "Profilo",
     "auth.title": "Entra in Exotic",
-    "auth.continueGuest": "Continua come ospite",
     "settings.title": "Impostazioni",
   },
   nl: {
@@ -670,7 +659,6 @@ const languageOverrides = {
     "shop.equip": "Uitrusten",
     "profile.title": "Profiel",
     "auth.title": "Ga naar Exotic",
-    "auth.continueGuest": "Doorgaan als gast",
     "settings.title": "Instellingen",
   },
   ru: {
@@ -710,7 +698,6 @@ const languageOverrides = {
     "shop.equip": "Надеть",
     "profile.title": "Профиль",
     "auth.title": "Войти в Exotic",
-    "auth.continueGuest": "Продолжить как гость",
     "settings.title": "Настройки",
   },
   tr: {
@@ -750,7 +737,6 @@ const languageOverrides = {
     "shop.equip": "Kuşan",
     "profile.title": "Profil",
     "auth.title": "Exotic’e gir",
-    "auth.continueGuest": "Misafir olarak devam et",
     "settings.title": "Ayarlar",
   },
   ja: {
@@ -790,7 +776,6 @@ const languageOverrides = {
     "shop.equip": "装備",
     "profile.title": "プロフィール",
     "auth.title": "Exotic に入る",
-    "auth.continueGuest": "ゲストで続ける",
     "settings.title": "設定",
   },
   ko: {
@@ -830,7 +815,6 @@ const languageOverrides = {
     "shop.equip": "장착",
     "profile.title": "프로필",
     "auth.title": "Exotic 입장",
-    "auth.continueGuest": "게스트로 계속",
     "settings.title": "설정",
   },
   zh: {
@@ -870,7 +854,6 @@ const languageOverrides = {
     "shop.equip": "装备",
     "profile.title": "个人资料",
     "auth.title": "进入 Exotic",
-    "auth.continueGuest": "以访客身份继续",
     "settings.title": "设置",
   },
   hi: {
@@ -910,7 +893,6 @@ const languageOverrides = {
     "shop.equip": "लगाएं",
     "profile.title": "प्रोफ़ाइल",
     "auth.title": "Exotic में प्रवेश करें",
-    "auth.continueGuest": "अतिथि के रूप में जारी रखें",
     "settings.title": "सेटिंग्स",
   },
   id: {
@@ -950,7 +932,6 @@ const languageOverrides = {
     "shop.equip": "Pakai",
     "profile.title": "Profil",
     "auth.title": "Masuk Exotic",
-    "auth.continueGuest": "Lanjut sebagai tamu",
     "settings.title": "Pengaturan",
   },
   ur: {
@@ -990,7 +971,6 @@ const languageOverrides = {
     "shop.equip": "تجهيز",
     "profile.title": "پروفائل",
     "auth.title": "Exotic میں داخل ہوں",
-    "auth.continueGuest": "بطور مہمان جاری رکھیں",
     "settings.title": "ترتیبات",
   },
 };
@@ -1369,6 +1349,25 @@ export const translations = Object.fromEntries(
   ]),
 );
 
+const localizedOrOverrides = {
+  en: "or",
+  ar: "أو",
+  fr: "ou",
+  es: "o",
+  de: "oder",
+  pt: "ou",
+  it: "o",
+  nl: "of",
+  ru: "или",
+  tr: "veya",
+  ja: "または",
+  ko: "또는",
+  zh: "或",
+  hi: "या",
+  id: "atau",
+  ur: "یا",
+};
+
 const publicCopyOverrides = {
   en: {
     "meta.description": "Exotic — a four-digit code brain teaser.",
@@ -1451,6 +1450,10 @@ for (const [locale, copy] of Object.entries(publicCopyOverrides)) {
     translations[locale]["multi.ready"];
   translations[locale]["settings.realtimeReady"] =
     translations[locale]["multi.ready"] || "Ready";
+}
+
+for (const [locale, value] of Object.entries(localizedOrOverrides)) {
+  translations[locale]["auth.or"] = value;
 }
 
 export function translate(locale, key, values = {}) {

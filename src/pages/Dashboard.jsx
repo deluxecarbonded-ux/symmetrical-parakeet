@@ -88,7 +88,7 @@ export default function Dashboard() {
   );
   const currentDifficulty =
     DIFFICULTIES.find((item) => item.id === "easy") || DIFFICULTIES[0];
-  const displayName = profile?.displayName || t("dashboard.guest");
+  const displayName = profile?.displayName || t("profile.defaultPlayerName");
 
   return (
     <main className="page dashboard-page">

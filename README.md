@@ -12,7 +12,7 @@ Exotic is a responsive code-and-word brain-teaser game built with React, Vite, L
 - Supabase-authoritative profiles, progress, wallets, inventories, activity, rooms, and purchases
 - No browser localStorage, sessionStorage, BroadcastChannel rooms, or fake local accounts
 - Separate single-player and multiplayer wallets, inventories, shops, profiles, and routes
-- Supabase email/password and anonymous auth with database-backed profiles
+- Supabase email/password auth with database-backed profiles
 - 16 complete locale dictionaries in `src/i18n/locales/`, plus shared UI and puzzle content keys in `src/i18n/`
 - Localized puzzle prompts, word answers, numeral systems, and fallback hint templates
 - Custom numeric keypad for digit answers and language-aware letters pad for word answers
@@ -52,17 +52,16 @@ The app requires Supabase environment variables and does not fall back to browse
    npm run db:seed
    ```
 4. Copy `.env.example` to `.env` and set `VITE_SUPABASE_URL` and the publishable key. Keep the database password, service-role key, and CLI token server-side only; never prefix them with `VITE_`. Rotate any credentials that were pasted into chat before production use.
-5. Enable anonymous sign-ins in Supabase Auth if guest entry is desired.
-6. Deploy the Edge Functions:
+5. Deploy the Edge Functions:
    ```bash
    npx supabase functions deploy ai-riddle --project-ref <PROJECT_REF>
    npx supabase functions deploy multiplayer-action --project-ref <PROJECT_REF>
    ```
-7. Add `OPENROUTER_API_KEY` and `APP_URL` as Edge Function secrets. The AI function discovers currently available zero-cost `:free` models, caches that catalog briefly, and automatically falls through on rate limits, expired models, timeouts, or provider outages. The API key is never exposed to the browser.
+6. Add `OPENROUTER_API_KEY` and `APP_URL` as Edge Function secrets. The AI function discovers currently available zero-cost `:free` models, caches that catalog briefly, and automatically falls through on rate limits, expired models, timeouts, or provider outages. The API key is never exposed to the browser.
 
 Because the browser storage policy is strict, the Supabase client keeps the auth session in memory only (`persistSession: false`); a page reload requires signing in again. This avoids localStorage/sessionStorage while keeping all durable state in Postgres.
 
-Migrations `001` through `008` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data.
+Migrations `001` through `009` are included. The migrations intentionally do not insert demo users or rooms. The configured seed files provide reviewed puzzle, shop, locale catalog, and localized word-answer validation data without creating player-owned data.
 
 ## Route map
 
@@ -76,8 +75,8 @@ Migrations `001` through `008` are included. The migrations intentionally do not
 - `/multi/profile` duel profile
 - `/settings` preferences, theme, locale, and database reset
 - `/single/auth` and `/multi/auth` separated auth entry points
-- `/auth` account entry and guest entry
+- `/auth` account entry
 
 ## Data model
 
-`supabase/migrations/001_exotic.sql` through `004_match_stats.sql` define the core schema, room lifecycle, rewards, and match statistics. `005_localized_answers.sql` adds word-answer support, `006_supabase_first_state.sql` adds preferences and app-state hydration, and `007_server_authority_and_rls.sql` locks private tables behind server-side RPCs, validates solo answers, and publishes only safe realtime state.
+`supabase/migrations/001_exotic.sql` through `004_match_stats.sql` define the core schema, room lifecycle, rewards, and match statistics. `005_localized_answers.sql` adds word-answer support, `006_supabase_first_state.sql` adds preferences and app-state hydration, `007_server_authority_and_rls.sql` locks private tables behind server-side RPCs, validates solo answers, and publishes only safe realtime state, `008_room_code_compatibility.sql` provides portable room-code generation, and `009_signup_identity_validation.sql` adds normalized usernames and signup availability checks.

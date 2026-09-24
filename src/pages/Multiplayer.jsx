@@ -252,7 +252,7 @@ function Lobby({
                   id="host-name"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder={t("dashboard.guest")}
+                  placeholder={t("auth.playerPlaceholder")}
                 />
               </div>
               <Button
@@ -837,12 +837,12 @@ export default function Multiplayer() {
       joinedFromUrl.current
     )
       return;
-    if (!profile || profile.isGuest) return;
+    if (!profile) return;
     joinedFromUrl.current = true;
     void multiplayer.joinRoom(requested, name || profile.displayName);
   }, [currentPlayer, multiplayer, name, params, profile, room]);
   const create = async () => {
-    if (!profile || profile.isGuest) {
+    if (!profile) {
       navigate("/multi/auth?next=/multi");
       return;
     }
@@ -854,7 +854,7 @@ export default function Multiplayer() {
     }
   };
   const join = async () => {
-    if (!profile || profile.isGuest) {
+    if (!profile) {
       navigate("/multi/auth?next=/multi");
       return;
     }

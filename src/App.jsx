@@ -20,12 +20,7 @@ import Auth from "./pages/Auth";
 import { useMultiplayerRoom } from "./lib/multiplayer";
 import { isSupabaseConfigured, requestAiHint, supabase } from "./lib/supabase";
 import { isRtl, LANGUAGES, translate } from "./i18n/translations";
-import {
-  DEFAULT_GUEST_NAME,
-  DEFAULT_PLAYER_NAME,
-  makeId,
-  useMemoryValue,
-} from "./lib/storage";
+import { DEFAULT_PLAYER_NAME, makeId, useMemoryValue } from "./lib/storage";
 
 export const AppContext = createContext(null);
 
@@ -99,11 +94,9 @@ export default function App() {
   const profileView = useMemo(() => {
     if (!profile) return null;
     const displayName =
-      profile.isGuest && profile.displayName === DEFAULT_GUEST_NAME
-        ? t("profile.defaultGuestName")
-        : !profile.isGuest && profile.displayName === DEFAULT_PLAYER_NAME
-          ? t("profile.defaultPlayerName")
-          : profile.displayName;
+      profile.displayName === DEFAULT_PLAYER_NAME
+        ? t("profile.defaultPlayerName")
+        : profile.displayName;
     return { ...profile, displayName };
   }, [profile, t]);
   const showToast = useCallback((key, values) => {
@@ -147,7 +140,6 @@ export default function App() {
         const serverProfile = {
           ...profile,
           ...state.profile,
-          isGuest: false,
         };
         setProfiles((current) => ({
           ...current,
@@ -345,12 +337,7 @@ export default function App() {
     [setSettings],
   );
   useEffect(() => {
-    if (
-      !isSupabaseConfigured ||
-      !profile ||
-      profile.isGuest ||
-      !settingsHydratedRef.current
-    )
+    if (!isSupabaseConfigured || !profile || !settingsHydratedRef.current)
       return undefined;
     const timeout = window.setTimeout(() => {
       supabase
@@ -429,9 +416,7 @@ export default function App() {
         8 +
         level +
         (difficulty === "hard" ? 8 : difficulty === "medium" ? 4 : 0);
-      const shouldPersist = Boolean(
-        isSupabaseConfigured && profile && !profile.isGuest,
-      );
+      const shouldPersist = Boolean(isSupabaseConfigured && profile);
       if (!shouldPersist) {
         setProgress((current) => {
           const single = current.single || initialProgress.single;
@@ -547,7 +532,7 @@ export default function App() {
 
   const multiplayer = useMultiplayerRoom({
     profile,
-    defaultName: t("profile.defaultGuestName"),
+    defaultName: t("profile.defaultPlayerName"),
     locale: settings.locale,
     onRoundWin: recordMultiRoundSafe,
     onMatchWin: recordMultiMatchSafe,
@@ -556,7 +541,7 @@ export default function App() {
 
   const purchaseItem = useCallback(
     async (item, mode) => {
-      if (!isSupabaseConfigured || !profile || profile.isGuest) {
+      if (!isSupabaseConfigured || !profile) {
         showToast("toast.needSignIn");
         return false;
       }
@@ -586,7 +571,7 @@ export default function App() {
 
   const equipItem = useCallback(
     async (item, mode) => {
-      if (!isSupabaseConfigured || !profile || profile.isGuest) {
+      if (!isSupabaseConfigured || !profile) {
         showToast("toast.needSignIn");
         return;
       }
@@ -602,34 +587,6 @@ export default function App() {
       await hydrateFromSupabase();
     },
     [hydrateFromSupabase, profile, showToast],
-  );
-
-  const signInGuest = useCallback(
-    async (name = DEFAULT_GUEST_NAME) => {
-      if (!isSupabaseConfigured) {
-        showToast("toast.syncUnavailable");
-        return null;
-      }
-      const { data, error } = await supabase.auth.signInAnonymously({
-        data: { display_name: name.trim() || DEFAULT_GUEST_NAME },
-      });
-      if (error || !data.user) {
-        showToast("toast.syncUnavailable");
-        return null;
-      }
-      const next = {
-        id: data.user.id,
-        displayName: name.trim() || DEFAULT_GUEST_NAME,
-        email: data.user.email,
-        isGuest: false,
-        isAnonymous: true,
-        createdAt: new Date().toISOString(),
-      };
-      setProfiles({ single: next, multi: next });
-      showToast("toast.signedIn");
-      return next;
-    },
-    [setProfiles, showToast],
   );
 
   const signIn = useCallback(
@@ -650,7 +607,6 @@ export default function App() {
             data.user.email?.split("@")[0] ||
             DEFAULT_PLAYER_NAME,
           email: data.user.email,
-          isGuest: false,
           createdAt: new Date().toISOString(),
         };
         setProfiles((current) => ({ ...current, single: next, multi: next }));
@@ -705,7 +661,6 @@ export default function App() {
           displayName,
           username,
           email: credentials.email,
-          isGuest: false,
           createdAt: new Date().toISOString(),
         };
         if (data.user)
@@ -770,7 +725,6 @@ export default function App() {
                     user.email?.split("@")[0] ||
                     DEFAULT_PLAYER_NAME,
                   email: user.email,
-                  isGuest: false,
                   createdAt: new Date().toISOString(),
                 },
           multi:
@@ -783,7 +737,6 @@ export default function App() {
                     user.email?.split("@")[0] ||
                     DEFAULT_PLAYER_NAME,
                   email: user.email,
-                  isGuest: false,
                   createdAt: new Date().toISOString(),
                 },
         }));
@@ -812,7 +765,6 @@ export default function App() {
               session.user.email?.split("@")[0] ||
               DEFAULT_PLAYER_NAME,
             email: session.user.email,
-            isGuest: false,
             createdAt: new Date().toISOString(),
           };
           setProfiles((current) => ({ ...current, single: next, multi: next }));
@@ -823,13 +775,13 @@ export default function App() {
   }, [profile, setProfiles, setSettings]);
 
   useEffect(() => {
-    if (!isSupabaseConfigured || !profile || profile.isGuest) {
+    if (!isSupabaseConfigured || !profile) {
       settingsHydratedRef.current = false;
       return;
     }
     settingsHydratedRef.current = false;
     hydrateFromSupabase();
-  }, [profile?.id, profile?.isGuest, hydrateFromSupabase]);
+  }, [profile?.id, hydrateFromSupabase]);
 
   const saveDisplayName = useCallback(
     (name) => {
@@ -839,7 +791,7 @@ export default function App() {
           ? { ...current, displayName: nextName || current.displayName }
           : current,
       );
-      if (isSupabaseConfigured && profile && !profile.isGuest && nextName) {
+      if (isSupabaseConfigured && profile && nextName) {
         supabase
           .rpc("update_profile_display_name", { p_display_name: nextName })
           .then(async ({ data, error }) => {
@@ -856,7 +808,7 @@ export default function App() {
   );
 
   const resetProgress = useCallback(async () => {
-    if (isSupabaseConfigured && profile && !profile.isGuest) {
+    if (isSupabaseConfigured && profile) {
       const { error } = await supabase.rpc("reset_user_progress");
       if (error) {
         showToast("toast.syncUnavailable");
@@ -915,7 +867,6 @@ export default function App() {
       updateSettings,
       profile: profileView,
       signIn,
-      signInGuest,
       signUp,
       signOut,
       authBusy,
@@ -958,7 +909,6 @@ export default function App() {
       settings,
       showToast,
       signIn,
-      signInGuest,
       signOut,
       signUp,
       t,

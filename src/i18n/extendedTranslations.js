@@ -9,7 +9,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — لعبة ألغاز في الوقت الفعلي لكسر الشيفرات الرباعية.",
     "nav.openNavigation": "فتح التنقل",
-    "profile.defaultGuestName": "ضيف",
     "profile.defaultPlayerName": "لاعب",
     "auth.showPassword": "إظهار كلمة المرور",
     "auth.hidePassword": "إخفاء كلمة المرور",
@@ -72,7 +71,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — un jeu de réflexion en temps réel pour casser des codes à quatre chiffres.",
     "nav.openNavigation": "Ouvrir la navigation",
-    "profile.defaultGuestName": "Invité",
     "profile.defaultPlayerName": "Joueur",
     "auth.showPassword": "Afficher le mot de passe",
     "auth.hidePassword": "Masquer le mot de passe",
@@ -141,7 +139,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — un juego de lógica en tiempo real para romper códigos de cuatro dígitos.",
     "nav.openNavigation": "Abrir navegación",
-    "profile.defaultGuestName": "Invitado",
     "profile.defaultPlayerName": "Jugador",
     "auth.showPassword": "Mostrar contraseña",
     "auth.hidePassword": "Ocultar contraseña",
@@ -210,7 +207,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — ein Echtzeit-Ratespiel für vierstellige Codes.",
     "nav.openNavigation": "Navigation öffnen",
-    "profile.defaultGuestName": "Gast",
     "profile.defaultPlayerName": "Spieler",
     "auth.showPassword": "Passwort anzeigen",
     "auth.hidePassword": "Passwort verbergen",
@@ -277,7 +273,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — um jogo de lógica em tempo real para quebrar códigos de quatro dígitos.",
     "nav.openNavigation": "Abrir navegação",
-    "profile.defaultGuestName": "Convidado",
     "profile.defaultPlayerName": "Jogador",
     "auth.showPassword": "Mostrar senha",
     "auth.hidePassword": "Ocultar senha",
@@ -346,7 +341,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — un gioco logico in tempo reale per rompere codici a quattro cifre.",
     "nav.openNavigation": "Apri navigazione",
-    "profile.defaultGuestName": "Ospite",
     "profile.defaultPlayerName": "Giocatore",
     "auth.showPassword": "Mostra password",
     "auth.hidePassword": "Nascondi password",
@@ -415,7 +409,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — een realtime denkspel voor viercijferige codes.",
     "nav.openNavigation": "Navigatie openen",
-    "profile.defaultGuestName": "Gast",
     "profile.defaultPlayerName": "Speler",
     "auth.showPassword": "Wachtwoord tonen",
     "auth.hidePassword": "Wachtwoord verbergen",
@@ -482,7 +475,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — игра на логику в реальном времени с кодами из четырёх цифр.",
     "nav.openNavigation": "Открыть навигацию",
-    "profile.defaultGuestName": "Гость",
     "profile.defaultPlayerName": "Игрок",
     "auth.showPassword": "Показать пароль",
     "auth.hidePassword": "Скрыть пароль",
@@ -550,7 +542,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — dört haneli kodlar için gerçek zamanlı bir bulmaca oyunu.",
     "nav.openNavigation": "Gezinmeyi aç",
-    "profile.defaultGuestName": "Misafir",
     "profile.defaultPlayerName": "Oyuncu",
     "auth.showPassword": "Şifreyi göster",
     "auth.hidePassword": "Şifreyi gizle",
@@ -617,7 +608,6 @@ const extendedLanguageOverrides = {
     "meta.title": "Exotic — コードを解け",
     "meta.description": "Exotic — 4桁のコードを解けるリアルタイムパズル",
     "nav.openNavigation": "ナビゲーションを開く",
-    "profile.defaultGuestName": "ゲスト",
     "profile.defaultPlayerName": "プレイヤー",
     "auth.showPassword": "パスワードを表示",
     "auth.hidePassword": "パスワードを隠す",
@@ -680,7 +670,6 @@ const extendedLanguageOverrides = {
     "meta.title": "Exotic — 코드를 풀어라",
     "meta.description": "Exotic — 네 자리 코드를 푸는 실시간 퍼즐 게임.",
     "nav.openNavigation": "탐색 열기",
-    "profile.defaultGuestName": "게스트",
     "profile.defaultPlayerName": "플레이어",
     "auth.showPassword": "비밀번호 표시",
     "auth.hidePassword": "비밀번호 숨기기",
@@ -743,7 +732,6 @@ const extendedLanguageOverrides = {
     "meta.title": "Exotic — 破解代码",
     "meta.description": "Exotic — 实时四位数代码解谜游戏。",
     "nav.openNavigation": "打开导航",
-    "profile.defaultGuestName": "访客",
     "profile.defaultPlayerName": "玩家",
     "auth.showPassword": "显示密码",
     "auth.hidePassword": "隐藏密码",
@@ -803,7 +791,6 @@ const extendedLanguageOverrides = {
     "meta.title": "Exotic — कोड तोड़ें",
     "meta.description": "Exotic — चार अंकों के कोड के लिए रियल-टाइम पज़ल गेम।",
     "nav.openNavigation": "नेविगेशन खोलें",
-    "profile.defaultGuestName": "अतिथि",
     "profile.defaultPlayerName": "खिलाड़ी",
     "auth.showPassword": "पासवर्ड दिखाएं",
     "auth.hidePassword": "पासवर्ड छिपाएं",
@@ -869,7 +856,6 @@ const extendedLanguageOverrides = {
     "meta.description":
       "Exotic — permainan teka-teki real-time untuk kode empat angka.",
     "nav.openNavigation": "Buka navigasi",
-    "profile.defaultGuestName": "Tamu",
     "profile.defaultPlayerName": "Pemain",
     "auth.showPassword": "Tampilkan kata sandi",
     "auth.hidePassword": "Sembunyikan kata sandi",
@@ -936,7 +922,6 @@ const extendedLanguageOverrides = {
     "meta.title": "Exotic — کوڈ توڑیں",
     "meta.description": "Exotic — چار ہندسے کوڈ کے لیے ریئل ٹائم پزل گیم۔",
     "nav.openNavigation": "نیویگیشن کھولیں",
-    "profile.defaultGuestName": "مہمان",
     "profile.defaultPlayerName": "کھلاڑی",
     "auth.showPassword": "پاس ورڈ دکھائیں",
     "auth.hidePassword": "پاس ورڈ چھپائیں",

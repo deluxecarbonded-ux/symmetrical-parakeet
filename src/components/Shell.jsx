@@ -112,14 +112,8 @@ function Sidebar({ onNavigate }) {
             {profile ? getInitials(profile.displayName) : "E"}
           </div>
           <div className="user-copy">
-            <strong>{profile?.displayName || t("dashboard.guest")}</strong>
-            <span>
-              {profile
-                ? profile.isGuest
-                  ? t("profile.local")
-                  : t("profile.connected")
-                : t("dashboard.guest")}
-            </span>
+            <strong>{profile?.displayName || t("nav.signIn")}</strong>
+            <span>{profile ? t("profile.connected") : t("nav.signIn")}</span>
           </div>
           {profile ? (
             <button

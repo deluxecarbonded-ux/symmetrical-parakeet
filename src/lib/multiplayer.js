@@ -136,9 +136,7 @@ function mapRoomRows({
   const players = asRows(playerRows)
     .map((row) => ({
       id: String(row?.profile_id || row?.profileId || row?.id || ""),
-      profileId: String(
-        row?.profile_id || row?.profileId || row?.id || "",
-      ),
+      profileId: String(row?.profile_id || row?.profileId || row?.id || ""),
       name: String(row?.display_name || row?.displayName || fallbackName),
       ready: Boolean(row?.ready),
       score: finiteNumber(row?.score, 0),
@@ -266,7 +264,7 @@ function actionErrorKey(error) {
 
 export function useMultiplayerRoom({
   profile,
-  defaultName = "Guest",
+  defaultName = "Player",
   locale = "en",
   onRoundWin,
   onMatchWin,
@@ -280,13 +278,7 @@ export function useMultiplayerRoom({
   const notifiedRoundsRef = useRef(new Set());
   const notifiedMatchesRef = useRef(new Set());
   const profileId = profile?.id ? String(profile.id) : null;
-  const canUseRemote = Boolean(
-    isSupabaseConfigured &&
-    supabase &&
-    profileId &&
-    profile &&
-    profile.isGuest !== true,
-  );
+  const canUseRemote = Boolean(isSupabaseConfigured && supabase && profileId);
 
   const clearRoom = useCallback(() => {
     roomRef.current = null;
@@ -758,12 +750,7 @@ export function useMultiplayerRoom({
         room.roundWinner === profileId
       ) {
         const roundPuzzle = puzzleFor(room, room.round);
-        notifyRoundWin(
-          room,
-          roundPuzzle,
-          roundPuzzle?.points,
-          room.round,
-        );
+        notifyRoundWin(room, roundPuzzle, roundPuzzle?.points, room.round);
       }
     }
     previousRoomRef.current = room;
@@ -1123,23 +1110,19 @@ export function useMultiplayerRoom({
       }
     })();
     return request;
-  }, [
-    canUseRemote,
-    clearRoom,
-    getActionUser,
-    notifyError,
-    showToast,
-  ]);
+  }, [canUseRemote, clearRoom, getActionUser, notifyError, showToast]);
 
   const player = useCallback(
     (name) => {
-      if (!profile || profile.isGuest === true || !profileId) return null;
+      if (!profile || !profileId) return null;
       return {
         id: profileId,
         name:
           String(
             name || currentPlayer?.name || profile.displayName || defaultName,
-          ).trim() || defaultName || "Player",
+          ).trim() ||
+          defaultName ||
+          "Player",
         ready: currentPlayer?.ready || false,
         score: currentPlayer?.score || 0,
         codes: currentPlayer?.codes || 0,

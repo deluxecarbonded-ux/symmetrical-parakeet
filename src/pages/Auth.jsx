@@ -15,7 +15,6 @@ import {
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useApp } from "../App";
 import { Button, Card, Pill } from "../components/Primitives";
-import { DEFAULT_GUEST_NAME } from "../lib/storage";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,13 +46,12 @@ function availabilityMessageKey(field, status) {
 }
 
 export default function Auth({ scope = "single" }) {
-  const { t, signIn, signUp, signInGuest, authBusy, showToast } = useApp();
+  const { t, signIn, signUp, authBusy, showToast } = useApp();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [mode, setMode] = useState("signin");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
-    name: "",
     username: "",
     email: "",
     password: "",
@@ -191,7 +189,7 @@ export default function Auth({ scope = "single" }) {
         ...form,
         email,
         username,
-        name: form.name.trim() || username,
+        name: username,
       });
       if (result) navigate(next, { replace: true });
       return;
@@ -199,14 +197,7 @@ export default function Auth({ scope = "single" }) {
     const result = await signIn({
       email: form.email,
       password: form.password,
-      name: form.name,
     });
-    if (result) navigate(next, { replace: true });
-  };
-  const guest = async () => {
-    const result = await signInGuest(
-      form.name.trim() || form.username.trim() || DEFAULT_GUEST_NAME,
-    );
     if (result) navigate(next, { replace: true });
   };
   return (
@@ -387,17 +378,6 @@ export default function Auth({ scope = "single" }) {
                   : t("auth.signUp")}
             </Button>
           </form>
-          <div className="auth-divider">
-            <span>{t("auth.or")}</span>
-          </div>
-          <Button
-            variant="quiet"
-            className="full-button"
-            onClick={guest}
-            icon={Sparkles}
-          >
-            {t("auth.continueGuest")}
-          </Button>
           <p className="auth-terms">{t("auth.terms")}</p>
         </Card>
       </div>
